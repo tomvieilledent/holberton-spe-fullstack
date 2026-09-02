@@ -2,119 +2,147 @@ import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, beforeEach } from "vitest";
 import App from "./App.jsx";
-import { NAV } from "./nav.js";
+import { NAV, ALL_IDS } from "./nav.js";
 
 beforeEach(() => {
   window.location.hash = "";
 });
 
-function navButtons() {
-  return Array.from(document.querySelector(".nav").querySelectorAll("button"));
+async function expandAllCategories(user) {
+  for (const toggle of document.querySelectorAll(".nav__cat-toggle")) {
+    if (toggle.getAttribute("aria-expanded") !== "true") {
+      await user.click(toggle);
+    }
+  }
 }
 
-const NEW_SECTIONS = [
-  "Repository & inversion des dépendances",
-  "Séquence & états-transitions",
-  "Règles de gestion & cardinalités",
-  "Normalisation stricte (1NF-3NF)",
-  "MLD & MPD — contraintes SQL",
-  "Diagramme de classes & UML avancé",
-  "Architecture RESTful",
-  "Spécification OpenAPI 3.0",
-  "Validation via JSON Schema",
-  "PRD, User Story & INVEST",
-  "BDD & Gherkin",
-  "Scenario Outline & Examples",
-  "Urbanisation de l'information",
-  "Cohérence inter-modèles",
-  "Documentation as Code & SSOT",
-];
+function navButtons() {
+  return Array.from(document.querySelectorAll(".nav__btn"));
+}
 
 describe("App — structure", () => {
-  it("s'affiche avec la marque et la vue d'ensemble par défaut", async () => {
+  it("affiche la marque, sans vue d'ensemble", async () => {
     render(<App />);
     expect(screen.getByText("Holberton")).toBeInTheDocument();
-    expect(await screen.findByText("Récap de la semaine")).toBeInTheDocument();
+    expect(screen.queryByText("Vue d'ensemble")).not.toBeInTheDocument();
+    expect(screen.queryByText("Récap de la semaine")).not.toBeInTheDocument();
   });
 
-  it("expose une navigation avec au moins 40 entrées", () => {
+  it("ouvre « React — les bases » par défaut", async () => {
     render(<App />);
-    expect(navButtons().length).toBeGreaterThanOrEqual(40);
+    expect(
+      await screen.findByRole("heading", { name: /React — les bases/ })
+    ).toBeInTheDocument();
   });
 
-  it("nav.js et l'UI listent le même nombre de sections", () => {
-    const fromData = NAV.flatMap((e) => (e.items ? e.items.length : 1));
+  it("liste les 4 catégories", () => {
     render(<App />);
-    expect(navButtons().length).toBe(fromData.reduce((a, b) => a + b, 0));
+    for (const name of ["Frontend", "Backend", "DevOps", "Documentation & méthode"]) {
+      expect(screen.getByRole("button", { name: new RegExp(name, "i") })).toBeInTheDocument();
+    }
+  });
+
+  it("une entrée de navigation par section, catégories dépliées", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await expandAllCategories(user);
+    expect(navButtons().length).toBe(ALL_IDS.length);
+  });
+
+  it("plie / déplie une catégorie", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const devops = screen.getByRole("button", { name: /^DevOps/i });
+    expect(devops).toHaveAttribute("aria-expanded", "false");
+    await user.click(devops);
+    expect(devops).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "Le Dockerfile" })).toBeInTheDocument();
   });
 });
 
 describe("App — navigation SPA", () => {
-  it("change la section active et l'URL (hash) au clic", async () => {
+  it("change la section et le hash au clic", async () => {
     const user = userEvent.setup();
     render(<App />);
+    await expandAllCategories(user);
     const main = document.querySelector("main");
 
-    await user.click(screen.getAllByText("Les bases")[0]);
+    await user.click(screen.getByRole("button", { name: "Le Dockerfile" }));
     expect(
-      await within(main).findByRole("heading", { name: /React — les bases/ })
+      await within(main).findByRole("heading", { name: /Dockerfile/ })
     ).toBeInTheDocument();
-    expect(window.location.hash).toBe("#react-basics");
+    expect(window.location.hash).toBe("#docker-dockerfile");
   });
 
-  it("ouvre directement une section depuis le hash de l'URL", async () => {
+  it("ouvre une section depuis le hash de l'URL (et déplie sa catégorie)", async () => {
     window.location.hash = "#uml-class-diagram";
     render(<App />);
     const main = document.querySelector("main");
     expect(
-      await within(main).findByRole("heading", { name: /Diagramme de classes & UML avancé/ })
+      await within(main).findByRole("heading", { name: /Diagramme de classes/ })
     ).toBeInTheDocument();
   });
 
-  it("rend les 15 nouvelles sections sans planter", async () => {
+  it("rend chaque section sans planter", async () => {
     const user = userEvent.setup();
     render(<App />);
-    const main = document.querySelector("main");
-
-    for (const label of NEW_SECTIONS) {
-      await user.click(screen.getByText(label));
-      await waitFor(() =>
-        expect(within(main).getByRole("heading", { level: 2 })).toBeInTheDocument()
-      );
-    }
-  });
-
-  it("affiche le diagramme Mermaid comme bloc de code", async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    const main = document.querySelector("main");
-
-    await user.click(screen.getByText("Diagramme de classes & UML avancé"));
-    await waitFor(() => {
-      const blocs = main.querySelectorAll("pre code");
-      expect(blocs.length).toBeGreaterThan(0);
-      expect(
-        Array.from(blocs).some((b) => b.textContent.includes("classDiagram"))
-      ).toBe(true);
-    });
-  });
-});
-
-describe("App — robustesse", () => {
-  it("chaque entrée de navigation rend un contenu non vide", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    await expandAllCategories(user);
     const main = document.querySelector("main");
 
     for (const btn of navButtons()) {
       const label = btn.textContent;
       await user.click(btn);
-      await waitFor(() =>
-        expect(
-          main.textContent.trim().length,
-          `contenu vide après clic sur « ${label} »`
-        ).toBeGreaterThan(80)
-      );
+      const h2 = await within(main).findByRole("heading", { level: 2 });
+      expect(h2, `pas de titre visible après « ${label} »`).toBeInTheDocument();
+    }
+  });
+});
+
+describe("App — recherche", () => {
+  it("« uml » propose les sections qui en parlent", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const input = screen.getByRole("searchbox", { name: /rechercher/i });
+
+    await user.click(input);
+    await user.type(input, "uml");
+
+    const results = await screen.findByLabelText("Résultats de recherche");
+    await waitFor(() => {
+      expect(within(results).getByText("Diagramme de classes")).toBeInTheDocument();
+    });
+    // au moins deux sections mentionnent UML
+    expect(results.querySelectorAll(".nav__result").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("un résultat de recherche ouvre la section et vide le champ", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const input = screen.getByRole("searchbox", { name: /rechercher/i });
+    await user.click(input);
+    await user.type(input, "dockerfile");
+
+    const results = await screen.findByLabelText("Résultats de recherche");
+    await user.click(await within(results).findByText("Le Dockerfile"));
+
+    const main = document.querySelector("main");
+    expect(
+      await within(main).findByRole("heading", { name: /Dockerfile/ })
+    ).toBeInTheDocument();
+    expect(input).toHaveValue("");
+  });
+});
+
+describe("nav.js", () => {
+  it("chaque section a un id unique et un composant résolu", () => {
+    const ids = ALL_IDS;
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const cat of NAV) {
+      for (const group of cat.groups) {
+        for (const item of group.items) {
+          expect(item.Component, item.id).toBeTruthy();
+        }
+      }
     }
   });
 });

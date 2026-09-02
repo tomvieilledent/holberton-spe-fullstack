@@ -20,13 +20,15 @@ Une ligne par semaine. Chaque semaine ajoute des sections au site
 | Semaine | Thème | Sections ajoutées | Docs impactés |
 | --- | --- | --- | --- |
 | — | Socle | React / Vue / Svelte, Outillage, Docker, DevOps & Git, CI/CD, Merise | — |
-| S+1 | Analyse & conception (approfondissement) | Architecture & Patterns, Modélisation des données, UML, API REST & Contrats, Spécifications & BDD, Urbanisation du SI | `architecture.md`, `data-model.sql`, `openapi.yaml` |
+| S+1 | Analyse & conception (approfondissement) | Architecture, Bases de données & modélisation, UML, API & contrats, Spécifier le besoin, Cohérence & documentation | `architecture.md`, `data-model.sql`, `openapi.yaml` |
+| S+1 | Refonte navigation | 4 catégories (Frontend / Backend / DevOps / Documentation & méthode), recherche plein texte, suppression de la « Vue d'ensemble » | `src/app/nav.js`, `src/app/search.js` |
 | S+2 | _à venir_ | | |
 
 ## Backlog d'idées d'évolution
 
 - [ ] Mode clair / sombre (persistance `localStorage`).
-- [ ] Recherche plein texte côté client (statique, index pré-build).
-- [ ] Lien permanent par section (`#hash` + `history.pushState`).
+- [x] Recherche plein texte côté client (index bâti depuis le source, chunk à la demande).
+- [x] Lien permanent par section (`#hash`).
+- [ ] Persistance de l'état plié/déplié des catégories (`localStorage`).
 - [ ] Génération de `NAV` depuis `docs/data-model.sql` (un seul modèle).
 - [ ] Backend optionnel sur le VPS exposant `docs/openapi.yaml`.

@@ -25,6 +25,16 @@ versionnage sémantique + Conventional Commits.
 
 ### Changed
 - `src/App.jsx` monolithique éclaté ; `main.jsx` pointe vers `src/app/App.jsx`.
+- **Navigation refondue** en 2 niveaux : 4 catégories (Frontend, Backend, DevOps,
+  Documentation & méthode) → groupes → sections, catégories repliables.
+  Libellés de groupes clarifiés (« Urbanisation du SI » → « Cohérence &
+  documentation », etc.).
+- Suppression de la section « Vue d'ensemble » ; section par défaut = React — les bases.
+- `nav.js` : résolution des sections via `import.meta.glob` (champ `file`).
+
+### Added
+- **Recherche plein texte** dans la barre latérale (`src/app/search.js`) : index
+  bâti depuis le source des sections, chunk chargé à la demande (~35 kB gzip).
 
 ## [1.0.0] - 2026-09-02
 

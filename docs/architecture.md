@@ -18,44 +18,55 @@ flowchart LR
 
 ## 2. Modèle de composants (React)
 
-Le site est une seule application React. Une donnée (`NAV`) décrit la
-navigation ; `App` garde l'état de la section active et rend le composant
-correspondant.
+`NAV` (dans `src/app/nav.js`) décrit la navigation sur 2 niveaux :
+catégorie → groupe → section. `App` garde l'état de la section active
+(synchronisé avec `#hash`), des catégories dépliées et de la recherche ;
+`search.js` bâtit un index plein texte à partir du source des sections.
 
 ```mermaid
 classDiagram
     class App {
         -active: string
-        -mobileOpen: boolean
+        -menuOpen: boolean
+        -openCats: Set~string~
+        -query: string
         +go(id) void
-        +render() JSX
     }
     class NAV {
         <<data>>
-        +entries: NavEntry[]
+        +Category[] categories
     }
-    class NavEntry {
+    class Category {
+        +name: string
+        +icon: Component
+        +Group[] groups
+    }
+    class Group {
+        +name: string
+        +accent: string
+        +Item[] items
+    }
+    class Item {
         +id: string
         +label: string
-        +icon: Component
-        +Component: Function
-        +items: NavEntry[]
+        +file: string
+        +Component: LazyComponent
     }
-    class NavButton {
-        +item: NavEntry
-        +active: boolean
-        +onClick() void
+    class SearchIndex {
+        <<lazy chunk>>
+        +buildIndex() Entry[]
+        +runSearch(q, index) Result[]
     }
     class Section {
         <<function component>>
-        +render() JSX
     }
 
     App --> NAV : lit
-    App *-- NavButton : compose
-    App ..> Section : rend la section active
-    NAV o-- NavEntry : contient
-    NavEntry o-- NavEntry : sous-sections
+    App ..> SearchIndex : charge à la demande
+    App ..> Section : rend la section active (Suspense)
+    NAV o-- Category
+    Category o-- Group
+    Group o-- Item
 ```
 
 ## 3. Inversion des dépendances (cible backend)

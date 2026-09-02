@@ -1,172 +1,262 @@
-/* Configuration de navigation — assemblée à partir des features. */
+/* Navigation — 2 niveaux : catégorie → groupe → section.
+   Chaque section est un fichier de src/features/, chargé à la demande. */
 import { lazy } from "react";
-import { BookOpen, Boxes, Building2, ClipboardCheck, Component, Container, Database, FileCode, FileJson, Flame, GitBranch, GitPullRequest, KeyRound, Layers, Leaf, ListChecks, Lock, Network, PlayCircle, Rocket, ScrollText, Share2, ShieldCheck, Sparkles, Table2, Terminal, UploadCloud, Workflow, Wrench } from "lucide-react";
-import { API_ACCENT, ARCH_ACCENT, CI_ACCENT, DEVOPS_ACCENT, DOCKER_ACCENT, MERISE_ACCENT, REACT_ACCENT, SPEC_ACCENT, SVELTE_ACCENT, TOOL_ACCENT, UML_ACCENT, URBA_ACCENT, VUE_ACCENT } from "../shared/ui/tokens.js";
+import {
+  BookOpen,
+  Boxes,
+  Building2,
+  ClipboardCheck,
+  Component,
+  Container,
+  Database,
+  FileCode,
+  FileJson,
+  Flame,
+  GitBranch,
+  GitPullRequest,
+  Infinity as InfinityIcon,
+  KeyRound,
+  Layers,
+  LayoutGrid,
+  Leaf,
+  Library,
+  ListChecks,
+  Lock,
+  Network,
+  PlayCircle,
+  Rocket,
+  ScrollText,
+  Server,
+  Share2,
+  ShieldCheck,
+  Table2,
+  Terminal,
+  UploadCloud,
+  Workflow,
+  Wrench,
+} from "lucide-react";
+import {
+  API_ACCENT,
+  ARCH_ACCENT,
+  CI_ACCENT,
+  DEVOPS_ACCENT,
+  DOCKER_ACCENT,
+  MERISE_ACCENT,
+  REACT_ACCENT,
+  SPEC_ACCENT,
+  SVELTE_ACCENT,
+  TOOL_ACCENT,
+  UML_ACCENT,
+  URBA_ACCENT,
+  VUE_ACCENT,
+} from "../shared/ui/tokens.js";
+
+const loaders = import.meta.glob("../features/**/*.jsx");
 
 export const NAV = [
   {
-    id: "overview",
-    label: "Vue d'ensemble",
-    icon: Sparkles,
-    accent: TOOL_ACCENT,
-    Component: lazy(() => import("../features/overview/Overview.jsx")),
-  },
-  {
-    group: "React",
+    category: "Frontend",
+    icon: LayoutGrid,
     accent: REACT_ACCENT,
-    icon: Component,
-    items: [
-      { id: "react-basics", label: "Les bases", icon: BookOpen, Component: lazy(() => import("../features/react/ReactBasics.jsx")) },
-      { id: "react-setup", label: "Monter un projet", icon: Wrench, Component: lazy(() => import("../features/react/ReactSetup.jsx")) },
-      { id: "react-deploy", label: "Déployer", icon: UploadCloud, Component: lazy(() => import("../features/react/ReactDeploy.jsx")) },
+    groups: [
+      {
+        group: "React",
+        accent: REACT_ACCENT,
+        icon: Component,
+        items: [
+          { id: "react-basics", label: "Les bases", icon: BookOpen, file: "react/ReactBasics.jsx" },
+          { id: "react-setup", label: "Monter le projet", icon: Wrench, file: "react/ReactSetup.jsx" },
+          { id: "react-deploy", label: "Déploiement", icon: UploadCloud, file: "react/ReactDeploy.jsx" },
+        ],
+      },
+      {
+        group: "Vue.js",
+        accent: VUE_ACCENT,
+        icon: Leaf,
+        items: [
+          { id: "vue-basics", label: "Les bases", icon: BookOpen, file: "vue/VueBasics.jsx" },
+          { id: "vue-setup", label: "Monter le projet", icon: Wrench, file: "vue/VueSetup.jsx" },
+          { id: "vue-deploy", label: "Déploiement", icon: UploadCloud, file: "vue/VueDeploy.jsx" },
+        ],
+      },
+      {
+        group: "Svelte",
+        accent: SVELTE_ACCENT,
+        icon: Flame,
+        items: [
+          { id: "svelte-basics", label: "Les bases", icon: BookOpen, file: "svelte/SvelteBasics.jsx" },
+          { id: "svelte-setup", label: "Monter le projet", icon: Wrench, file: "svelte/SvelteSetup.jsx" },
+          { id: "svelte-deploy", label: "Déploiement", icon: UploadCloud, file: "svelte/SvelteDeploy.jsx" },
+        ],
+      },
+      {
+        group: "Outillage",
+        accent: TOOL_ACCENT,
+        icon: Terminal,
+        items: [
+          { id: "tooling", label: "Vite · ESLint · Tailwind · Lucide", icon: Wrench, file: "tooling/CommonTooling.jsx" },
+        ],
+      },
     ],
   },
   {
-    group: "Vue.js",
-    accent: VUE_ACCENT,
-    icon: Leaf,
-    items: [
-      { id: "vue-basics", label: "Les bases", icon: BookOpen, Component: lazy(() => import("../features/vue/VueBasics.jsx")) },
-      { id: "vue-setup", label: "Monter un projet", icon: Wrench, Component: lazy(() => import("../features/vue/VueSetup.jsx")) },
-      { id: "vue-deploy", label: "Déployer", icon: UploadCloud, Component: lazy(() => import("../features/vue/VueDeploy.jsx")) },
-    ],
-  },
-  {
-    group: "Svelte",
-    accent: SVELTE_ACCENT,
-    icon: Flame,
-    items: [
-      { id: "svelte-basics", label: "Les bases", icon: BookOpen, Component: lazy(() => import("../features/svelte/SvelteBasics.jsx")) },
-      { id: "svelte-setup", label: "Monter un projet", icon: Wrench, Component: lazy(() => import("../features/svelte/SvelteSetup.jsx")) },
-      { id: "svelte-deploy", label: "Déployer", icon: UploadCloud, Component: lazy(() => import("../features/svelte/SvelteDeploy.jsx")) },
-    ],
-  },
-  {
-    group: "Docker",
-    accent: DOCKER_ACCENT,
-    icon: Container,
-    items: [
-      { id: "docker-basics", label: "Les bases", icon: BookOpen, Component: lazy(() => import("../features/docker/DockerBasics.jsx")) },
-      { id: "docker-dockerfile", label: "Le Dockerfile", icon: Wrench, Component: lazy(() => import("../features/docker/DockerDockerfile.jsx")) },
-      { id: "docker-compose", label: "Docker Compose", icon: Boxes, Component: lazy(() => import("../features/docker/DockerCompose.jsx")) },
-      { id: "docker-security", label: "Volumes, réseaux & sécurité", icon: Lock, Component: lazy(() => import("../features/docker/DockerSecurity.jsx")) },
-    ],
-  },
-  {
-    group: "DevOps & Git",
-    accent: DEVOPS_ACCENT,
-    icon: GitBranch,
-    items: [
-      { id: "devops-culture", label: "Culture (CALMS)", icon: ShieldCheck, Component: lazy(() => import("../features/devops/DevOpsCulture.jsx")) },
-      { id: "devops-metrics", label: "Métriques DORA", icon: Rocket, Component: lazy(() => import("../features/devops/DevOpsMetrics.jsx")) },
-      { id: "git-workflows", label: "Workflows Git", icon: GitBranch, Component: lazy(() => import("../features/devops/GitWorkflows.jsx")) },
-    ],
-  },
-  {
-    group: "CI/CD",
-    accent: CI_ACCENT,
-    icon: PlayCircle,
-    items: [
-      { id: "ci-basics", label: "Les bases d'un workflow", icon: BookOpen, Component: lazy(() => import("../features/cicd/CIBasics.jsx")) },
-      { id: "ci-secrets-matrix", label: "Secrets, cache & matrices", icon: Lock, Component: lazy(() => import("../features/cicd/CISecretsMatrix.jsx")) },
-      { id: "ci-publish-docker", label: "Publier une image Docker", icon: UploadCloud, Component: lazy(() => import("../features/cicd/CIPublishDocker.jsx")) },
-    ],
-  },
-  {
-    group: "Analyse & Conception",
-    accent: MERISE_ACCENT,
-    icon: Database,
-    items: [
-      { id: "merise-entities", label: "Entités & propriétés", icon: BookOpen, Component: lazy(() => import("../features/merise/MeriseEntities.jsx")) },
-      { id: "merise-cardinalities", label: "Associations & cardinalités", icon: GitBranch, Component: lazy(() => import("../features/merise/MeriseCardinalities.jsx")) },
-      { id: "merise-porteuse", label: "L'association porteuse", icon: Boxes, Component: lazy(() => import("../features/merise/MeriseAssociationPorteuse.jsx")) },
-      { id: "merise-normalization", label: "Normalisation (1NF-3NF)", icon: ShieldCheck, Component: lazy(() => import("../features/merise/MeriseNormalization.jsx")) },
-    ],
-  },
-  {
-    group: "Architecture & Patterns",
-    accent: ARCH_ACCENT,
-    icon: Layers,
-    items: [
-      { id: "arch-repository", label: "Repository & inversion des dépendances", icon: Boxes, Component: lazy(() => import("../features/architecture/ArchRepository.jsx")) },
-      { id: "arch-dynamic-diagrams", label: "Séquence & états-transitions", icon: Workflow, Component: lazy(() => import("../features/architecture/ArchDynamicDiagrams.jsx")) },
-    ],
-  },
-  {
-    group: "Modélisation des données",
-    accent: MERISE_ACCENT,
-    icon: Database,
-    items: [
-      { id: "data-business-rules", label: "Règles de gestion & cardinalités", icon: Table2, Component: lazy(() => import("../features/data-modeling/DataBusinessRules.jsx")) },
-      { id: "data-normalization-strict", label: "Normalisation stricte (1NF-3NF)", icon: ShieldCheck, Component: lazy(() => import("../features/data-modeling/DataNormalizationStrict.jsx")) },
-      { id: "data-physical-model", label: "MLD & MPD — contraintes SQL", icon: KeyRound, Component: lazy(() => import("../features/data-modeling/DataPhysicalModel.jsx")) },
-    ],
-  },
-  {
-    group: "UML",
-    accent: UML_ACCENT,
-    icon: Component,
-    items: [
-      { id: "uml-class-diagram", label: "Diagramme de classes & UML avancé", icon: Share2, Component: lazy(() => import("../features/uml/UmlClassDiagram.jsx")) },
-    ],
-  },
-  {
-    group: "API REST & Contrats",
-    accent: API_ACCENT,
-    icon: Network,
-    items: [
-      { id: "rest-principles", label: "Architecture RESTful", icon: Network, Component: lazy(() => import("../features/api-rest/RestPrinciples.jsx")) },
-      { id: "openapi-spec", label: "Spécification OpenAPI 3.0", icon: FileJson, Component: lazy(() => import("../features/api-rest/OpenApiSpec.jsx")) },
-      { id: "json-schema-validation", label: "Validation via JSON Schema", icon: ListChecks, Component: lazy(() => import("../features/api-rest/JsonSchemaValidation.jsx")) },
-    ],
-  },
-  {
-    group: "Spécifications & BDD",
+    category: "Backend",
+    icon: Server,
     accent: SPEC_ACCENT,
-    icon: BookOpen,
-    items: [
-      { id: "spec-prd-user-story", label: "PRD, User Story & INVEST", icon: ClipboardCheck, Component: lazy(() => import("../features/specs-bdd/SpecPrdUserStory.jsx")) },
-      { id: "bdd-gherkin", label: "BDD & Gherkin", icon: ScrollText, Component: lazy(() => import("../features/specs-bdd/BddGherkin.jsx")) },
-      { id: "bdd-scenario-outline", label: "Scenario Outline & Examples", icon: Table2, Component: lazy(() => import("../features/specs-bdd/BddScenarioOutline.jsx")) },
+    groups: [
+      {
+        group: "Bases de données",
+        accent: MERISE_ACCENT,
+        icon: Database,
+        items: [
+          { id: "merise-entities", label: "Entités & propriétés", icon: BookOpen, file: "merise/MeriseEntities.jsx" },
+          { id: "merise-cardinalities", label: "Associations & cardinalités", icon: GitBranch, file: "merise/MeriseCardinalities.jsx" },
+          { id: "merise-porteuse", label: "L'association porteuse", icon: Boxes, file: "merise/MeriseAssociationPorteuse.jsx" },
+          { id: "merise-normalization", label: "Normalisation (1NF–3NF)", icon: ShieldCheck, file: "merise/MeriseNormalization.jsx" },
+        ],
+      },
+      {
+        group: "Modélisation des données",
+        accent: MERISE_ACCENT,
+        icon: Table2,
+        items: [
+          { id: "data-business-rules", label: "Règles de gestion & MCD", icon: Table2, file: "data-modeling/DataBusinessRules.jsx" },
+          { id: "data-normalization-strict", label: "Normalisation stricte", icon: ShieldCheck, file: "data-modeling/DataNormalizationStrict.jsx" },
+          { id: "data-physical-model", label: "Schéma SQL de production", icon: KeyRound, file: "data-modeling/DataPhysicalModel.jsx" },
+        ],
+      },
+      {
+        group: "API & contrats",
+        accent: API_ACCENT,
+        icon: Network,
+        items: [
+          { id: "rest-principles", label: "Principes REST", icon: Network, file: "api-rest/RestPrinciples.jsx" },
+          { id: "openapi-spec", label: "OpenAPI (Swagger)", icon: FileJson, file: "api-rest/OpenApiSpec.jsx" },
+          { id: "json-schema-validation", label: "Validation JSON Schema", icon: ListChecks, file: "api-rest/JsonSchemaValidation.jsx" },
+        ],
+      },
     ],
   },
   {
-    group: "Urbanisation du SI",
-    accent: URBA_ACCENT,
-    icon: Building2,
-    items: [
-      { id: "urban-information", label: "Urbanisation de l'information", icon: Building2, Component: lazy(() => import("../features/urbanization/UrbanInformation.jsx")) },
-      { id: "inter-model-consistency", label: "Cohérence inter-modèles", icon: GitPullRequest, Component: lazy(() => import("../features/urbanization/InterModelConsistency.jsx")) },
-      { id: "docs-as-code-ssot", label: "Documentation as Code & SSOT", icon: FileCode, Component: lazy(() => import("../features/urbanization/DocsAsCodeSsot.jsx")) },
+    category: "DevOps",
+    icon: InfinityIcon,
+    accent: DOCKER_ACCENT,
+    groups: [
+      {
+        group: "Docker",
+        accent: DOCKER_ACCENT,
+        icon: Container,
+        items: [
+          { id: "docker-basics", label: "Les bases", icon: BookOpen, file: "docker/DockerBasics.jsx" },
+          { id: "docker-dockerfile", label: "Le Dockerfile", icon: FileCode, file: "docker/DockerDockerfile.jsx" },
+          { id: "docker-compose", label: "Docker Compose", icon: Boxes, file: "docker/DockerCompose.jsx" },
+          { id: "docker-security", label: "Volumes, réseaux & sécurité", icon: Lock, file: "docker/DockerSecurity.jsx" },
+        ],
+      },
+      {
+        group: "Intégration & déploiement continus",
+        accent: CI_ACCENT,
+        icon: PlayCircle,
+        items: [
+          { id: "ci-basics", label: "GitHub Actions — les bases", icon: BookOpen, file: "cicd/CIBasics.jsx" },
+          { id: "ci-secrets-matrix", label: "Secrets, cache & matrices", icon: Lock, file: "cicd/CISecretsMatrix.jsx" },
+          { id: "ci-publish-docker", label: "Publier une image Docker", icon: UploadCloud, file: "cicd/CIPublishDocker.jsx" },
+        ],
+      },
+      {
+        group: "Culture & Git",
+        accent: DEVOPS_ACCENT,
+        icon: GitBranch,
+        items: [
+          { id: "devops-culture", label: "Culture DevOps (CALMS)", icon: ShieldCheck, file: "devops/DevOpsCulture.jsx" },
+          { id: "devops-metrics", label: "Métriques DORA", icon: Rocket, file: "devops/DevOpsMetrics.jsx" },
+          { id: "git-workflows", label: "Workflows Git & commits", icon: GitBranch, file: "devops/GitWorkflows.jsx" },
+        ],
+      },
     ],
   },
   {
-    id: "tooling",
-    label: "Outillage commun",
-    icon: Terminal,
-    accent: TOOL_ACCENT,
-    Component: lazy(() => import("../features/tooling/CommonTooling.jsx")),
+    category: "Documentation & méthode",
+    icon: Library,
+    accent: DEVOPS_ACCENT,
+    groups: [
+      {
+        group: "Architecture",
+        accent: ARCH_ACCENT,
+        icon: Layers,
+        items: [
+          { id: "arch-repository", label: "Repository & inversion des dépendances", icon: Boxes, file: "architecture/ArchRepository.jsx" },
+          { id: "arch-dynamic-diagrams", label: "Diagrammes de séquence & d'états", icon: Workflow, file: "architecture/ArchDynamicDiagrams.jsx" },
+        ],
+      },
+      {
+        group: "Modélisation UML",
+        accent: UML_ACCENT,
+        icon: Share2,
+        items: [
+          { id: "uml-class-diagram", label: "Diagramme de classes", icon: Share2, file: "uml/UmlClassDiagram.jsx" },
+        ],
+      },
+      {
+        group: "Spécifier le besoin",
+        accent: SPEC_ACCENT,
+        icon: ClipboardCheck,
+        items: [
+          { id: "spec-prd-user-story", label: "PRD & User Stories (INVEST)", icon: ClipboardCheck, file: "specs-bdd/SpecPrdUserStory.jsx" },
+          { id: "bdd-gherkin", label: "BDD & Gherkin", icon: ScrollText, file: "specs-bdd/BddGherkin.jsx" },
+          { id: "bdd-scenario-outline", label: "Scénarios paramétrés", icon: Table2, file: "specs-bdd/BddScenarioOutline.jsx" },
+        ],
+      },
+      {
+        group: "Cohérence & documentation",
+        accent: URBA_ACCENT,
+        icon: Building2,
+        items: [
+          { id: "urban-information", label: "Aligner les modèles", icon: Building2, file: "urbanization/UrbanInformation.jsx" },
+          { id: "inter-model-consistency", label: "Cohérence entre modèles", icon: GitPullRequest, file: "urbanization/InterModelConsistency.jsx" },
+          { id: "docs-as-code-ssot", label: "Documentation as Code (SSOT)", icon: FileCode, file: "urbanization/DocsAsCodeSsot.jsx" },
+        ],
+      },
+    ],
   },
 ];
 
-export function findComponent(id) {
-  for (const entry of NAV) {
-    if (entry.id === id) return entry.Component;
-    if (entry.items) {
-      const found = entry.items.find((i) => i.id === id);
-      if (found) return found.Component;
+/* Résolution du composant paresseux depuis le fichier de la section. */
+for (const cat of NAV) {
+  for (const group of cat.groups) {
+    for (const item of group.items) {
+      const key = `../features/${item.file}`;
+      const loader = loaders[key];
+      if (!loader) throw new Error(`Section introuvable : ${key}`);
+      item.Component = lazy(loader);
     }
   }
-  return NAV[0].Component;
 }
 
+export const ALL_IDS = NAV.flatMap((cat) =>
+  cat.groups.flatMap((group) => group.items.map((item) => item.id))
+);
+
+export const DEFAULT_ID = NAV[0].groups[0].items[0].id;
+
 export function findEntry(id) {
-  for (const entry of NAV) {
-    if (entry.id === id) return entry;
-    if (entry.items) {
-      const hit = entry.items.find((i) => i.id === id);
-      if (hit) return { ...hit, accent: entry.accent, group: entry.group };
+  for (const cat of NAV) {
+    for (const group of cat.groups) {
+      const hit = group.items.find((i) => i.id === id);
+      if (hit) {
+        return { ...hit, group: group.group, groupAccent: group.accent, category: cat.category };
+      }
     }
   }
-  return NAV[0];
+  const first = NAV[0].groups[0].items[0];
+  return {
+    ...first,
+    group: NAV[0].groups[0].group,
+    groupAccent: NAV[0].groups[0].accent,
+    category: NAV[0].category,
+  };
+}
+
+export function findComponent(id) {
+  return findEntry(id).Component;
 }

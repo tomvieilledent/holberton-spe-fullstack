@@ -24,6 +24,8 @@ maximum de concepts du cursus.
 | --- | --- |
 | Composants React, JSX, `useState`, hooks, lifting state up | `src/app/App.jsx`, `src/features/**` |
 | Architecture SPA feature-sliced + `React.lazy` / `Suspense` (code-splitting par section) | `src/features/<feature>/`, `src/app/nav.js` |
+| Navigation à 2 niveaux (catégorie → groupe → section), catégories repliables | `src/app/App.jsx`, `src/app/nav.js` |
+| Recherche plein texte côté client (index bâti depuis le source des sections, chunk chargé à la demande) | `src/app/search.js` |
 | Responsive **mobile-first**, routage par hash (deep links) | `src/index.css`, `src/app/App.jsx` |
 | Monter un projet avec Vite | `vite.config.js`, `index.html`, `src/main.jsx` |
 | ESLint (guillemets, points-virgules, variables inutilisées) | `eslint.config.js` |
@@ -42,14 +44,14 @@ maximum de concepts du cursus.
 | REST, OpenAPI 3.0, JSON Schema | `docs/openapi.yaml` |
 | PRD, User Story, critères INVEST | `docs/curriculum.md`, `.github/ISSUE_TEMPLATE/weekly-update.md` |
 | BDD, Gherkin, Scenario Outline | `features/navigation.feature` |
-| Urbanisation du SI, cohérence inter-modèles | `docs/architecture.md` (dictionnaire de données) |
+| Aligner les modèles, cohérence entre modèles | `docs/architecture.md` (dictionnaire de données) |
 | Documentation as Code, SSOT, ADR | `docs/` versionné avec le code |
 
 ## Stack
 
 - **React 18** + **Vite** (build statique, HMR, code-splitting par section)
 - Architecture **feature-sliced** : `src/features/<feature>/` + `src/shared/ui/` + `src/app/`
-- SPA **mobile-first**, tiroir de navigation, deep links par `#hash`
+- SPA **mobile-first**, navigation à 2 niveaux repliable, **recherche plein texte**, deep links par `#hash`
 - **Vitest** + **Testing Library** (tests de comportement, environnement jsdom)
 - **ESLint 9** (flat config) + `eslint-plugin-react-hooks`
 - **GitHub Actions** : CI (lint / tests / build sur Node 20 & 22) + déploiement automatique
@@ -106,15 +108,16 @@ décrit dans [`CONTRIBUTING.md`](./CONTRIBUTING.md) et suivi dans
 holberton-fullstack/
 ├── src/
 │   ├── app/
-│   │   ├── App.jsx          # shell : layout mobile-first, tiroir, routage #hash, Suspense
-│   │   ├── App.test.jsx     # tests de navigation et de rendu
-│   │   └── nav.js           # NAV assemblé depuis les features (lazy imports)
+│   │   ├── App.jsx          # shell : layout mobile-first, tiroir, nav 2 niveaux, #hash, Suspense
+│   │   ├── App.test.jsx     # tests de navigation, de rendu et de recherche
+│   │   ├── nav.js           # NAV (catégorie → groupe → section), lazy imports via import.meta.glob
+│   │   └── search.js        # index plein texte (chargé à la demande)
 │   ├── features/            # une notion = un dossier = un chunk
 │   │   ├── react/           #   ReactBasics.jsx, ReactSetup.jsx, ReactDeploy.jsx
 │   │   ├── docker/  devops/  cicd/  merise/  vue/  svelte/
 │   │   ├── architecture/  data-modeling/  uml/
 │   │   ├── api-rest/  specs-bdd/  urbanization/
-│   │   └── overview/  tooling/
+│   │   └── tooling/
 │   ├── shared/ui/
 │   │   ├── primitives.jsx   # H2, H3, P, Ul, Code, InlineCode, Note, Table, SourceLink
 │   │   └── tokens.js        # couleurs, polices

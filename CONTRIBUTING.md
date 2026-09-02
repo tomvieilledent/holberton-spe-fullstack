@@ -17,8 +17,9 @@ Il évolue chaque semaine avec les notions vues en cours.
      (`import { H2, H3, P, Ul, Code, InlineCode, Note, Table, SourceLink }
      from "../../shared/ui/primitives.jsx"`) et les accents
      (`import { X_ACCENT } from "../../shared/ui/tokens.js"`) ;
-   - déclarer la section dans `src/app/nav.js` via un `lazy(() => import(...))`
-     (ordre = ordre du cours) ;
+   - déclarer la section dans `src/app/nav.js` : une entrée `{ id, label, icon,
+     file }` dans le bon groupe d'une catégorie (`file` = chemin relatif à
+     `src/features/`, le composant est résolu via `import.meta.glob`) ;
    - la rédaction suit `docs/ai/authoring.md` (assistée par IA, vérifiée) ;
    - **ne jamais modifier** une section existante sans raison explicite.
 3. **Documenter** en parallèle (Documentation as Code / SSOT) :

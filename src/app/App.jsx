@@ -1,21 +1,22 @@
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, Menu, X } from "lucide-react";
-import { NAV, findEntry } from "./nav.js";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { ChevronDown, ChevronRight, Menu, Search, X } from "lucide-react";
+import { NAV, ALL_IDS, DEFAULT_ID, findEntry } from "./nav.js";
 
-/* Tous les identifiants de section valides (groupes + sous-sections). */
-const VALID_IDS = new Set(
-  NAV.flatMap((entry) =>
-    entry.items ? entry.items.map((i) => i.id) : [entry.id]
-  )
-);
+const VALID_IDS = new Set(ALL_IDS);
 
 function readHash() {
   const id = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
-  return VALID_IDS.has(id) ? id : "overview";
+  return VALID_IDS.has(id) ? id : DEFAULT_ID;
 }
 
-function NavButton({ item, active, accent, onClick, topLevel }) {
-  const Icon = item.icon;
+function NavButton({ item, active, accent, onClick }) {
   return (
     <button
       type="button"
@@ -25,9 +26,6 @@ function NavButton({ item, active, accent, onClick, topLevel }) {
       style={{ "--accent": accent }}
       onClick={onClick}
     >
-      {topLevel && Icon ? (
-        <Icon className="nav__btn-icon" size={15} aria-hidden="true" />
-      ) : null}
       <span className="nav__btn-label">{item.label}</span>
       {active ? (
         <ChevronRight className="nav__btn-caret" size={14} aria-hidden="true" />
@@ -47,6 +45,11 @@ function SectionFallback() {
 export default function App() {
   const [active, setActive] = useState(readHash);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openCats, setOpenCats] = useState(
+    () => new Set([findEntry(readHash()).category])
+  );
+  const [query, setQuery] = useState("");
+  const [search, setSearch] = useState(null); // { entries, run } — chargé à la demande
   const mainRef = useRef(null);
 
   const entry = useMemo(() => findEntry(active), [active]);
@@ -55,10 +58,34 @@ export default function App() {
   const go = useCallback((id) => {
     setActive(id);
     setMenuOpen(false);
+    setQuery("");
     if (window.location.hash.slice(1) !== id) {
       window.location.hash = id;
     }
   }, []);
+
+  const toggleCat = useCallback((name) => {
+    setOpenCats((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  }, []);
+
+  const ensureSearch = useCallback(() => {
+    if (search) return;
+    import("./search.js").then((m) => {
+      setSearch({ entries: m.buildIndex(), run: m.runSearch });
+    });
+  }, [search]);
+
+  const results = useMemo(() => {
+    if (!search || query.trim().length < 2) return [];
+    return search.run(query, search.entries);
+  }, [search, query]);
+
+  const searching = query.trim().length >= 2;
 
   /* Navigation arrière/avant du navigateur. */
   useEffect(() => {
@@ -67,13 +94,19 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  /* Au changement de section : focus + remontée en haut (accessibilité). */
+  /* La catégorie de la section active reste dépliée. */
+  useEffect(() => {
+    const cat = findEntry(active).category;
+    setOpenCats((prev) => (prev.has(cat) ? prev : new Set(prev).add(cat)));
+  }, [active]);
+
+  /* Changement de section : focus + retour en haut. */
   useEffect(() => {
     mainRef.current?.focus();
     try {
       window.scrollTo({ top: 0 });
     } catch {
-      /* environnement sans scroll (jsdom) */
+      /* jsdom */
     }
   }, [active]);
 
@@ -129,42 +162,111 @@ export default function App() {
           </button>
         </div>
 
-        <nav className="nav" aria-label="Sections du cours">
-          {NAV.map((item, idx) =>
-            item.items ? (
-              <div
-                className="nav__group"
-                key={item.group}
-                style={{ marginTop: idx === 0 ? 0 : 18 }}
-              >
-                <div className="nav__group-label" style={{ "--accent": item.accent }}>
-                  {item.icon ? (
-                    <item.icon size={14} aria-hidden="true" />
-                  ) : null}
-                  {item.group}
-                </div>
-                {item.items.map((sub) => (
-                  <NavButton
-                    key={sub.id}
-                    item={sub}
-                    accent={item.accent}
-                    active={active === sub.id}
-                    onClick={() => go(sub.id)}
-                  />
-                ))}
-              </div>
+        <div className="nav__search">
+          <Search size={14} aria-hidden="true" />
+          <input
+            type="search"
+            className="nav__search-input"
+            placeholder="Rechercher (ex. uml, docker, rest…)"
+            value={query}
+            onFocus={ensureSearch}
+            onChange={(e) => {
+              ensureSearch();
+              setQuery(e.target.value);
+            }}
+            aria-label="Rechercher une section"
+          />
+          {query ? (
+            <button
+              type="button"
+              className="nav__search-clear"
+              aria-label="Effacer la recherche"
+              onClick={() => setQuery("")}
+            >
+              <X size={14} aria-hidden="true" />
+            </button>
+          ) : null}
+        </div>
+
+        {searching ? (
+          <div className="nav__results" aria-label="Résultats de recherche">
+            {!search ? (
+              <p className="nav__results-msg">Indexation…</p>
+            ) : results.length === 0 ? (
+              <p className="nav__results-msg">Aucun résultat pour « {query.trim()} »</p>
             ) : (
-              <NavButton
-                key={item.id}
-                item={item}
-                accent={item.accent}
-                active={active === item.id}
-                onClick={() => go(item.id)}
-                topLevel
-              />
-            )
-          )}
-        </nav>
+              results.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className="nav__result"
+                  style={{ "--accent": r.accent }}
+                  onClick={() => go(r.id)}
+                >
+                  <span className="nav__result-label">{r.label}</span>
+                  <span className="nav__result-path">
+                    {r.category} · {r.group}
+                  </span>
+                  {r.snippet ? (
+                    <span className="nav__result-snippet">{r.snippet}</span>
+                  ) : null}
+                </button>
+              ))
+            )}
+          </div>
+        ) : (
+          <nav className="nav" aria-label="Sections du cours">
+            {NAV.map((cat) => {
+              const open = openCats.has(cat.category);
+              return (
+                <section className="nav__cat" key={cat.category}>
+                  <button
+                    type="button"
+                    className="nav__cat-toggle"
+                    aria-expanded={open}
+                    style={{ "--accent": cat.accent }}
+                    onClick={() => toggleCat(cat.category)}
+                  >
+                    <cat.icon size={16} aria-hidden="true" />
+                    <span className="nav__cat-name">{cat.category}</span>
+                    <ChevronDown
+                      className="nav__cat-caret"
+                      data-open={open || undefined}
+                      size={15}
+                      aria-hidden="true"
+                    />
+                  </button>
+                  {open ? (
+                    <div className="nav__cat-body">
+                      {cat.groups.map((g) => (
+                        <div className="nav__group" key={g.group}>
+                          <div
+                            className="nav__group-label"
+                            style={{ "--accent": g.accent }}
+                          >
+                            {g.icon ? (
+                              <g.icon size={13} aria-hidden="true" />
+                            ) : null}
+                            {g.group}
+                          </div>
+                          {g.items.map((it) => (
+                            <NavButton
+                              key={it.id}
+                              item={it}
+                              accent={g.accent}
+                              active={active === it.id}
+                              onClick={() => go(it.id)}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </section>
+              );
+            })}
+          </nav>
+        )}
       </aside>
 
       <main id="section" className="app__main" tabIndex={-1} ref={mainRef}>

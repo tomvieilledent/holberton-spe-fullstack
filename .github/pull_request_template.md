@@ -1,6 +1,6 @@
 <!--
 Titre de la PR au format Conventional Commits, ex :
-  feat(nav): ajoute la section "Urbanisation du SI"
+  feat(nav): ajoute la section "Cohérence entre modèles"
 -->
 
 ## Contexte
