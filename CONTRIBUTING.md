@@ -1,0 +1,71 @@
+# Contribuer
+
+Ce dépôt suit **GitHub flow** et la spécification **Conventional Commits**.
+Il évolue chaque semaine avec les notions vues en cours.
+
+## Rythme hebdomadaire
+
+À chaque nouvelle semaine de cours :
+
+1. **Brancher** depuis `main` :
+   ```bash
+   git switch -c week-XX-sujet
+   ```
+2. **Ajouter** les nouvelles sections dans `src/App.jsx`
+   - une fonction composant par section, réutilisant les blocs existants
+     (`H2`, `H3`, `P`, `Ul`, `Code`, `InlineCode`, `Note`, `Table`, `SourceLink`) ;
+   - référencer la section dans le tableau `NAV` (ordre = ordre du cours) ;
+   - **ne jamais modifier** une section existante sans raison explicite.
+3. **Documenter** en parallèle (Documentation as Code / SSOT) :
+   - mettre à jour `docs/curriculum.md` (semaine, notions, liens) ;
+   - si la semaine introduit un modèle : `docs/data-model.sql`,
+     `docs/architecture.md` ou `docs/openapi.yaml` ;
+   - une décision structurante ⇒ un ADR dans `docs/adr/`.
+4. **Vérifier** localement :
+   ```bash
+   npm run ci        # lint + tests + build
+   ```
+5. **Ouvrir une PR** — titre au format Conventional Commits, CI verte requise.
+6. **Merger** dans `main` ⇒ déploiement GitHub Pages automatique.
+7. **Supprimer** la branche.
+
+## Conventional Commits
+
+Format : `<type>[scope optionnel][!]: <description>`
+
+Types utilisés : `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`,
+`style`, `build`, `perf`, `revert`.
+
+- `feat` — nouvelle section, nouvelle fonctionnalité du site.
+- `docs` — `docs/`, `README`, commentaires.
+- `test` — ajout / correction de tests.
+- `ci` — workflows GitHub Actions, Dependabot.
+- `chore` — dépendances, configuration.
+
+Un commit = un seul type de changement. Pas de trailer `Co-Authored-By`.
+
+Exemples :
+
+```
+feat(nav): ajoute la section "Diagrammes de séquence et d'états-transitions"
+docs(curriculum): consigne la semaine 8 (analyse & conception)
+test(app): couvre le rendu des 15 nouvelles sections
+ci: ajoute Node 22 à la matrice
+```
+
+## Critères d'acceptation d'une section (INVEST appliqué)
+
+- **I**ndependent — la section se lit seule, sans dépendre d'une autre.
+- **N**egotiable — le contenu peut être reformulé sans changer l'intention.
+- **V**aluable — elle apporte une notion révisable réellement utile.
+- **E**stimable — le périmètre tient en une PR.
+- **S**mall — une section = un concept.
+- **T**estable — elle apparaît dans `NAV` et se rend sans erreur
+  (couvert par `src/App.test.jsx`).
+
+## Style de code
+
+- ESLint fait foi : `npm run lint` doit passer.
+- Guillemets doubles, points-virgules obligatoires.
+- Les identifiants de code et noms techniques restent en langue d'origine ;
+  le texte pédagogique est en français, accents inclus.

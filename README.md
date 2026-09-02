@@ -1,0 +1,125 @@
+# Holberton — spé Full Stack
+
+[![CI](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml)
+[![Deploy](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml)
+[![Pages](https://img.shields.io/badge/site-GitHub%20Pages-121013?logo=github)](https://tomvieilledent.github.io/holberton-fullstack/)
+
+Site **statique** de révision de la spécialisation Holberton Full Stack : une
+seule application React (Vite) qui présente, semaine après semaine, les notions
+vues en cours — React / Vue / Svelte, l'outillage front, Docker, la culture
+DevOps & Git, GitHub Actions, l'analyse et la conception (Merise, UML), les API
+REST / OpenAPI / JSON Schema, les spécifications (PRD, INVEST, BDD/Gherkin) et
+l'urbanisation du SI.
+
+> 🔗 **Site en ligne :** <https://tomvieilledent.github.io/holberton-fullstack/>
+
+## Ce dépôt est lui-même l'exercice
+
+Le contenu du site enseigne des notions ; le dépôt les **applique**. La règle du
+projet : rester 100 % statique, mais matérialiser dans la structure du repo un
+maximum de concepts du cursus.
+
+| Notion du cours | Où elle est appliquée dans le repo |
+| --- | --- |
+| Composants React, JSX, `useState`, lifting state up | `src/App.jsx` |
+| Monter un projet avec Vite | `vite.config.js`, `index.html`, `src/main.jsx` |
+| ESLint (guillemets, points-virgules, variables inutilisées) | `eslint.config.js` |
+| Icônes Lucide | `src/App.jsx` (import `lucide-react`) |
+| Déploiement sur GitHub Pages | `.github/workflows/deploy.yml` + `base: "./"` |
+| Docker : empaqueter une application (build multi-stage) | `Dockerfile`, `nginx.conf`, `.dockerignore` |
+| Culture DevOps (CALMS), métriques DORA | `docs/adr/`, CI qui mesure lint + tests + build |
+| Workflows Git, GitHub flow, Conventional Commits | `CONTRIBUTING.md`, `.github/pull_request_template.md` |
+| GitHub Actions : workflow, `on`, jobs, steps, **matrice**, **cache** | `.github/workflows/ci.yml` |
+| Publier une image / automatiser | `.github/workflows/*.yml`, `.github/dependabot.yml` |
+| Merise : MCD, MLD, MPD, contraintes SQL (`CHECK`, `FK`, `ON DELETE`) | `docs/data-model.sql` |
+| Normalisation 1NF / 2NF / 3NF | `docs/data-model.sql` (commentaires) |
+| UML : diagramme de classes, séquence, états-transitions | `docs/architecture.md` (Mermaid) |
+| Repository & inversion des dépendances | `docs/architecture.md` |
+| REST, OpenAPI 3.0, JSON Schema | `docs/openapi.yaml` |
+| PRD, User Story, critères INVEST | `docs/curriculum.md`, `.github/ISSUE_TEMPLATE/weekly-update.md` |
+| BDD, Gherkin, Scenario Outline | `features/navigation.feature` |
+| Urbanisation du SI, cohérence inter-modèles | `docs/architecture.md` (dictionnaire de données) |
+| Documentation as Code, SSOT, ADR | `docs/` versionné avec le code |
+
+## Stack
+
+- **React 18** + **Vite 5** (build statique, HMR)
+- **Vitest** + **Testing Library** (tests de comportement, environnement jsdom)
+- **ESLint 9** (flat config) + `eslint-plugin-react-hooks`
+- **GitHub Actions** : CI (lint / tests / build sur Node 20 & 22) + déploiement Pages
+- **Docker** (optionnel) : image nginx servant le build
+
+## Démarrer
+
+```bash
+nvm use            # Node 20 (voir .nvmrc)
+npm install
+npm run dev        # http://localhost:3000
+```
+
+## Scripts
+
+| Script | Commande | Rôle |
+| --- | --- | --- |
+| `dev` | `npm run dev` | Serveur de développement (HMR) |
+| `lint` | `npm run lint` | Analyse ESLint |
+| `fix` | `npm run fix` | Corrige ce qui est auto-corrigeable |
+| `test` | `npm run test` | Tests en mode watch |
+| `test:run` | `npm run test:run` | Tests une fois (utilisé en CI) |
+| `test:coverage` | `npm run test:coverage` | Tests + rapport de couverture |
+| `build` | `npm run build` | Build de production dans `dist/` |
+| `preview` | `npm run preview` | Sert le build en local |
+| `ci` | `npm run ci` | `lint` + `test:run` + `build` |
+
+## Docker
+
+```bash
+docker build -t holberton-fullstack .
+docker run --rm -p 8080:80 holberton-fullstack
+# http://localhost:8080
+```
+
+## Déploiement
+
+Le déploiement est **automatique** : tout `push` sur `main` déclenche
+`.github/workflows/deploy.yml`, qui build le site et le publie via
+**GitHub Pages (source : GitHub Actions)**. Aucune branche `gh-pages` à gérer.
+
+Activation unique côté dépôt : `Settings → Pages → Build and deployment →
+Source : GitHub Actions`.
+
+## Rythme hebdomadaire
+
+Le site évolue chaque semaine avec les nouvelles notions. Le processus est
+décrit dans [`CONTRIBUTING.md`](./CONTRIBUTING.md) et suivi dans
+[`docs/curriculum.md`](./docs/curriculum.md).
+
+## Structure
+
+```
+holberton-fullstack/
+├── src/
+│   ├── App.jsx            # le site (toutes les sections de cours)
+│   ├── App.test.jsx       # tests de navigation et de rendu
+│   ├── main.jsx           # point d'entrée React
+│   ├── index.css          # reset minimal
+│   └── test/setup.js      # setup Vitest / jest-dom
+├── docs/
+│   ├── architecture.md    # diagrammes UML (Mermaid), dictionnaire de données
+│   ├── curriculum.md      # journal semaine par semaine
+│   ├── data-model.sql     # MPD PostgreSQL du domaine "cursus"
+│   ├── openapi.yaml       # contrat d'API (hypothétique, read-only)
+│   └── adr/               # Architecture Decision Records
+├── features/
+│   └── navigation.feature # spécification exécutable (Gherkin)
+├── .github/
+│   ├── workflows/ci.yml
+│   ├── workflows/deploy.yml
+│   └── dependabot.yml
+├── Dockerfile
+└── nginx.conf
+```
+
+## Licence
+
+[MIT](./LICENSE) © 2026 Tom Vieilledent
