@@ -1,0 +1,143 @@
+openapi: 3.0.3
+info:
+  title: Curriculum API
+  version: 0.1.0
+  description: >
+    Contrat d'API (lecture seule) du domaine "cursus". Hypothétique tant que le
+    site reste statique ; devient exécutable si un backend est déployé sur le
+    VPS. Sert d'exercice pour REST, OpenAPI 3.0 et JSON Schema.
+servers:
+  - url: https://www.vlldnt.com/api/v1
+
+paths:
+  /weeks:
+    get:
+      summary: Liste les semaines de cours
+      operationId: listWeeks
+      responses:
+        "200":
+          description: Collection de semaines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Week"
+
+  /sections:
+    get:
+      summary: Liste les sections
+      operationId: listSections
+      parameters:
+        - name: week
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Collection de sections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Section"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /sections/{sectionId}:
+    get:
+      summary: Détail d'une section
+      operationId: getSection
+      parameters:
+        - name: sectionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-z0-9-]+$"
+      responses:
+        "200":
+          description: Section trouvée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Section"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Week:
+      type: object
+      additionalProperties: false
+      required: [number, title, startedOn]
+      properties:
+        number:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+        startedOn:
+          type: string
+          format: date
+
+    Section:
+      type: object
+      additionalProperties: false
+      required: [sectionId, title, trackId, weekNumber, resources]
+      properties:
+        sectionId:
+          type: string
+          pattern: "^[a-z0-9-]+$"
+        title:
+          type: string
+        trackId:
+          type: string
+          pattern: "^[a-z0-9-]+$"
+        weekNumber:
+          type: integer
+          minimum: 1
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/Resource"
+
+    Resource:
+      type: object
+      additionalProperties: false
+      required: [label, url]
+      properties:
+        label:
+          type: string
+        url:
+          type: string
+          format: uri
+          pattern: "^https?://"
+
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [bad_request, not_found, internal]
+        message:
+          type: string
