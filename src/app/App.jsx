@@ -7,9 +7,10 @@ import {
   useState,
 } from "react";
 import { ChevronDown, ChevronRight, Menu, Search, X } from "lucide-react";
-import { NAV, ALL_IDS, DEFAULT_ID, findEntry } from "./nav.js";
+import { NAV, ALL_IDS, DEFAULT_ID, HOME, findEntry } from "./nav.js";
 
 const VALID_IDS = new Set(ALL_IDS);
+const HomeIcon = HOME.icon;
 
 function readHash() {
   const id = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
@@ -46,7 +47,7 @@ export default function App() {
   const [active, setActive] = useState(readHash);
   const [menuOpen, setMenuOpen] = useState(false);
   const [openCats, setOpenCats] = useState(
-    () => new Set([findEntry(readHash()).category])
+    () => new Set([findEntry(readHash()).category].filter(Boolean))
   );
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState(null); // { entries, run } — chargé à la demande
@@ -97,6 +98,7 @@ export default function App() {
   /* La catégorie de la section active reste dépliée. */
   useEffect(() => {
     const cat = findEntry(active).category;
+    if (!cat) return;
     setOpenCats((prev) => (prev.has(cat) ? prev : new Set(prev).add(cat)));
   }, [active]);
 
@@ -148,10 +150,15 @@ export default function App() {
 
       <aside id="sidebar" className="app__sidebar">
         <div className="app__brand">
-          <div>
-            <div className="app__brand-name">Holberton</div>
-            <div className="app__brand-sub">spé Full Stack</div>
-          </div>
+          <button
+            type="button"
+            className="app__brand-link"
+            aria-label="Aller à l'accueil"
+            onClick={() => go("home")}
+          >
+            <span className="app__brand-name">Holberton</span>
+            <span className="app__brand-sub">spé Full Stack</span>
+          </button>
           <button
             type="button"
             className="app__close"
@@ -216,6 +223,20 @@ export default function App() {
           </div>
         ) : (
           <nav className="nav" aria-label="Sections du cours">
+            <button
+              type="button"
+              className="nav__btn nav__home"
+              data-active={active === "home" || undefined}
+              aria-current={active === "home" ? "page" : undefined}
+              onClick={() => go("home")}
+            >
+              <HomeIcon className="nav__btn-icon" size={15} aria-hidden="true" />
+              <span className="nav__btn-label">Accueil</span>
+              {active === "home" ? (
+                <ChevronRight className="nav__btn-caret" size={14} aria-hidden="true" />
+              ) : null}
+            </button>
+
             {NAV.map((cat) => {
               const open = openCats.has(cat.category);
               return (

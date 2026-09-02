@@ -14,6 +14,7 @@ import {
   Flame,
   GitBranch,
   GitPullRequest,
+  Home,
   Infinity as InfinityIcon,
   KeyRound,
   Layers,
@@ -221,25 +222,44 @@ export const NAV = [
   },
 ];
 
+/* Entrée d'accueil : hors catégories, section par défaut. */
+export const HOME = {
+  id: "home",
+  label: "Accueil",
+  icon: Home,
+  file: "home/Home.jsx",
+};
+
 /* Résolution du composant paresseux depuis le fichier de la section. */
+function resolve(item) {
+  const key = `../features/${item.file}`;
+  const loader = loaders[key];
+  if (!loader) throw new Error(`Section introuvable : ${key}`);
+  item.Component = lazy(loader);
+}
+
+resolve(HOME);
 for (const cat of NAV) {
   for (const group of cat.groups) {
     for (const item of group.items) {
-      const key = `../features/${item.file}`;
-      const loader = loaders[key];
-      if (!loader) throw new Error(`Section introuvable : ${key}`);
-      item.Component = lazy(loader);
+      resolve(item);
     }
   }
 }
 
-export const ALL_IDS = NAV.flatMap((cat) =>
-  cat.groups.flatMap((group) => group.items.map((item) => item.id))
-);
+export const ALL_IDS = [
+  HOME.id,
+  ...NAV.flatMap((cat) =>
+    cat.groups.flatMap((group) => group.items.map((item) => item.id))
+  ),
+];
 
-export const DEFAULT_ID = NAV[0].groups[0].items[0].id;
+export const DEFAULT_ID = HOME.id;
 
 export function findEntry(id) {
+  if (id === HOME.id) {
+    return { ...HOME, group: null, groupAccent: null, category: null };
+  }
   for (const cat of NAV) {
     for (const group of cat.groups) {
       const hit = group.items.find((i) => i.id === id);
@@ -248,13 +268,7 @@ export function findEntry(id) {
       }
     }
   }
-  const first = NAV[0].groups[0].items[0];
-  return {
-    ...first,
-    group: NAV[0].groups[0].group,
-    groupAccent: NAV[0].groups[0].accent,
-    category: NAV[0].category,
-  };
+  return { ...HOME, group: null, groupAccent: null, category: null };
 }
 
 export function findComponent(id) {
