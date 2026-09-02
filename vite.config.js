@@ -2,11 +2,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// GitHub Pages sert le site depuis un sous-dossier (/nom-du-repo/).
-// Un chemin de base relatif garantit que les assets se chargent partout
-// (Pages, `vite preview`, ouverture directe du build, conteneur nginx).
+// Le site est servi à la racine du domaine (https://vlldnt.fr) par nginx.
+// `base: "/"` = chemins d'assets absolus depuis la racine.
+// (Pour un déploiement en sous-dossier — GitHub Pages projet — repasser à "./".)
 export default defineConfig({
-  base: "./",
+  base: "/",
   plugins: [react()],
   server: { host: "0.0.0.0", port: 3000 },
   preview: { host: "0.0.0.0", port: 4173 },

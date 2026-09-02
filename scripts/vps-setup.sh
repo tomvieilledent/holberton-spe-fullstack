@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# =====================================================================
+#  Provisionnement du VPS OVH pour servir https://vlldnt.fr
+#  À lancer UNE FOIS, en root, sur le VPS (Debian 12 / Ubuntu 22.04+).
+#  Idempotent : relançable sans casse.
+#
+#  ATTENTION : remplace le vhost par défaut de nginx et prend la main
+#  sur vlldnt.fr / www.vlldnt.fr.
+#
+#  Usage :
+#    export EMAIL="tomvieilledent@gmail.com"
+#    export CI_PUBKEY="ssh-ed25519 AAAA... gha-deploy-vlldnt"
+#    bash vps-setup.sh
+# =====================================================================
+set -euo pipefail
+
+DOMAIN="${DOMAIN:-vlldnt.fr}"
+EMAIL="${EMAIL:?export EMAIL=ton-email@exemple.fr}"
+CI_PUBKEY="${CI_PUBKEY:?export CI_PUBKEY='ssh-ed25519 AAAA... gha-deploy'}"
+DEPLOY_USER="${DEPLOY_USER:-deploy}"
+WEBROOT="/var/www/${DOMAIN}"
+ACMEROOT="/var/www/certbot"
+
+echo ">> Paquets"
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -qq
+apt-get install -y nginx rsync ufw certbot
+
+echo ">> Utilisateur de déploiement : ${DEPLOY_USER}"
+id -u "${DEPLOY_USER}" >/dev/null 2>&1 || adduser --disabled-password --gecos "" "${DEPLOY_USER}"
+install -d -m 700 -o "${DEPLOY_USER}" -g "${DEPLOY_USER}" "/home/${DEPLOY_USER}/.ssh"
+printf '%s\n' "${CI_PUBKEY}" > "/home/${DEPLOY_USER}/.ssh/authorized_keys"
+chown "${DEPLOY_USER}:${DEPLOY_USER}" "/home/${DEPLOY_USER}/.ssh/authorized_keys"
+chmod 600 "/home/${DEPLOY_USER}/.ssh/authorized_keys"
+
+echo ">> Racine web : ${WEBROOT}"
+install -d -o "${DEPLOY_USER}" -g "${DEPLOY_USER}" "${WEBROOT}"
+install -d "${ACMEROOT}"
+if [ ! -f "${WEBROOT}/index.html" ]; then
+  printf '<!doctype html><meta charset="utf-8"><title>%s</title><h1>%s — déploiement en cours</h1>\n' \
+    "${DOMAIN}" "${DOMAIN}" > "${WEBROOT}/index.html"
+  chown "${DEPLOY_USER}:${DEPLOY_USER}" "${WEBROOT}/index.html"
+fi
+
+echo ">> Pare-feu (UFW)"
+ufw allow OpenSSH        >/dev/null
+ufw allow 'Nginx Full'   >/dev/null
+ufw --force enable       >/dev/null
+
+echo ">> Vhost bootstrap (HTTP)"
+rm -f /etc/nginx/sites-enabled/default
+cat > "/etc/nginx/sites-available/${DOMAIN}.conf" <<EOF
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN} www.${DOMAIN};
+    root ${WEBROOT};
+    index index.html;
+    location /.well-known/acme-challenge/ { root ${ACMEROOT}; }
+    location / { try_files \$uri \$uri/ /index.html; }
+}
+EOF
+ln -sf "/etc/nginx/sites-available/${DOMAIN}.conf" "/etc/nginx/sites-enabled/${DOMAIN}.conf"
+nginx -t
+systemctl reload nginx
+
+echo ">> Certificat Let's Encrypt (webroot)"
+certbot certonly --webroot -w "${ACMEROOT}" \
+  -d "${DOMAIN}" -d "www.${DOMAIN}" \
+  --non-interactive --agree-tos -m "${EMAIL}" --keep-until-expiring
+
+echo ">> Vhost final (HTTPS)"
+cat > "/etc/nginx/sites-available/${DOMAIN}.conf" <<'EOF'
+server {
+    listen 80;
+    listen [::]:80;
+    server_name vlldnt.fr www.vlldnt.fr;
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 301 https://vlldnt.fr$request_uri; }
+}
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name www.vlldnt.fr;
+    ssl_certificate     /etc/letsencrypt/live/vlldnt.fr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/vlldnt.fr/privkey.pem;
+    return 301 https://vlldnt.fr$request_uri;
+}
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name vlldnt.fr;
+    root /var/www/vlldnt.fr;
+    index index.html;
+
+    ssl_certificate     /etc/letsencrypt/live/vlldnt.fr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/vlldnt.fr/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 512;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+}
+EOF
+nginx -t
+systemctl reload nginx
+
+echo ">> Rechargement de nginx après renouvellement auto du certificat"
+install -d /etc/letsencrypt/renewal-hooks/deploy
+printf '#!/bin/sh\nsystemctl reload nginx\n' > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+
+echo
+echo "OK. Prochaines étapes :"
+echo "  1. DNS : A ${DOMAIN} -> IP du VPS, A www.${DOMAIN} -> IP du VPS"
+echo "  2. Secrets GitHub : SSH_HOST, SSH_USER=${DEPLOY_USER}, SSH_KEY (clé privée)"
+echo "  3. git push origin main  ->  le workflow deploy.yml publie dist/ ici"
