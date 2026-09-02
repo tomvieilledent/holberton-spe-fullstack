@@ -56,7 +56,7 @@ export function P({ children }) {
   );
 }
 
-export function H2({ accent, children }) {
+export function H2({ accent, rule = true, children }) {
   return (
     <h2
       style={{
@@ -66,8 +66,8 @@ export function H2({ accent, children }) {
         color: TEXT,
         marginTop: 34,
         marginBottom: 10,
-        paddingBottom: 10,
-        borderBottom: `1px solid ${LINE}`,
+        paddingBottom: rule ? 10 : 0,
+        borderBottom: rule ? `1px solid ${LINE}` : "none",
         display: "flex",
         alignItems: "baseline",
         gap: 10,

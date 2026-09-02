@@ -75,7 +75,9 @@ export default function Home() {
   return (
     <div>
       <div style={BLEED}>
-        <H2 accent={REACT_ACCENT}>Holberton — spécialisation Full Stack</H2>
+        <H2 accent={REACT_ACCENT} rule={false}>
+          Holberton — spécialisation Full Stack
+        </H2>
       </div>
 
       <Hero />
