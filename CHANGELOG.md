@@ -15,7 +15,10 @@ versionnage sémantique + Conventional Commits.
 - Tests Vitest + Testing Library : navigation, deep link, rendu des 15 nouvelles
   sections, smoke test sur toutes les entrées de `NAV`.
 - CI GitHub Actions : lint + tests + build sur Node 20 et 22 (matrice, cache npm).
-- Déploiement automatique (GitHub Pages via Actions ; cible VPS en préparation).
+- Déploiement continu vers un **VPS OVH** (`rsync` over SSH) : `deploy.yml`
+  réécrit, `scripts/vps-setup.sh` (nginx + certbot + user `deploy`),
+  `deploy/nginx/vlldnt.fr.conf`, `docs/deployment.md`, ADR 0004.
+- `vite.config.js` : `base` passe de `"./"` à `"/"` (service à la racine du domaine).
 - Docker : build multi-stage + nginx.
 - Documentation as Code : `docs/` (architecture, ADR, MPD SQL, OpenAPI,
   `ai/authoring.md`), `features/` (Gherkin).

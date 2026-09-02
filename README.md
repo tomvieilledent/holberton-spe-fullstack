@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml)
 [![Deploy](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml)
-[![Site](https://img.shields.io/badge/site-www.vlldnt.fr-2ea44f)](https://www.vlldnt.fr)
+[![Site](https://img.shields.io/badge/site-vlldnt.fr-2ea44f)](https://vlldnt.fr)
 
 Site **statique** de révision de la spécialisation Holberton Full Stack : une
 seule application React (Vite) qui présente, semaine après semaine, les notions
@@ -11,8 +11,8 @@ DevOps & Git, GitHub Actions, l'analyse et la conception (Merise, UML), les API
 REST / OpenAPI / JSON Schema, les spécifications (PRD, INVEST, BDD/Gherkin) et
 l'urbanisation du SI.
 
-> 🔗 **Site en ligne :** <https://www.vlldnt.fr> (VPS + nginx)
-> Miroir : <https://tomvieilledent.github.io/holberton-fullstack/> (GitHub Pages)
+> 🔗 **Site en ligne :** <https://vlldnt.fr> — VPS OVH + nginx, déploiement
+> automatique à chaque `push` sur `main`.
 
 ## Ce dépôt est lui-même l'exercice
 
@@ -29,7 +29,7 @@ maximum de concepts du cursus.
 | ESLint (guillemets, points-virgules, variables inutilisées) | `eslint.config.js` |
 | Icônes Lucide | `src/shared/ui/`, `src/features/**` (import `lucide-react`) |
 | Rédaction de contenu assistée par IA, vérifiée et complétée | `docs/ai/authoring.md` |
-| Déploiement sur GitHub Pages | `.github/workflows/deploy.yml` + `base: "./"` |
+| Déploiement continu sur VPS (nginx, HTTPS Let's Encrypt) | `.github/workflows/deploy.yml`, `scripts/vps-setup.sh`, `deploy/nginx/` |
 | Docker : empaqueter une application (build multi-stage) | `Dockerfile`, `nginx.conf`, `.dockerignore` |
 | Culture DevOps (CALMS), métriques DORA | `docs/adr/`, CI qui mesure lint + tests + build |
 | Workflows Git, GitHub flow, Conventional Commits | `CONTRIBUTING.md`, `.github/pull_request_template.md` |
@@ -87,12 +87,12 @@ docker run --rm -p 8080:80 holberton-fullstack
 
 ## Déploiement
 
-Le déploiement est **automatique** : tout `push` sur `main` déclenche
-`.github/workflows/deploy.yml`, qui build le site et le publie via
-**GitHub Pages (source : GitHub Actions)**. Aucune branche `gh-pages` à gérer.
+**Automatique** : tout `push` sur `main` déclenche
+`.github/workflows/deploy.yml`, qui build le site puis `rsync` le `dist/` sur le
+**VPS OVH** où **nginx** le sert en HTTPS sur `https://vlldnt.fr`.
 
-Activation unique côté dépôt : `Settings → Pages → Build and deployment →
-Source : GitHub Actions`.
+Mise en route (une fois) et détail des secrets : **[`docs/deployment.md`](./docs/deployment.md)**.
+Décision d'architecture : [`docs/adr/0004-deploiement-vps-ovh.md`](./docs/adr/0004-deploiement-vps-ovh.md).
 
 ## Rythme hebdomadaire
 
@@ -124,10 +124,13 @@ holberton-fullstack/
 ├── docs/
 │   ├── architecture.md      # diagrammes UML (Mermaid), dictionnaire de données
 │   ├── curriculum.md        # journal semaine par semaine
+│   ├── deployment.md        # runbook VPS OVH + HTTPS
 │   ├── data-model.sql       # MPD PostgreSQL du domaine "cursus"
 │   ├── openapi.yaml         # contrat d'API (hypothétique, read-only)
 │   ├── ai/authoring.md      # pipeline de rédaction assistée par IA
-│   └── adr/                 # Architecture Decision Records
+│   └── adr/                 # Architecture Decision Records (0001..0004)
+├── deploy/nginx/vlldnt.fr.conf  # vhost de référence (SSOT)
+├── scripts/vps-setup.sh     # provisionnement du VPS (idempotent)
 ├── features/
 │   └── navigation.feature   # spécification exécutable (Gherkin)
 ├── .github/
