@@ -35,6 +35,41 @@ function NavButton({ item, active, accent, onClick }) {
   );
 }
 
+/* Marque du site — même dessin que /favicon.svg (icône d'app / favicon). */
+function BrandMark() {
+  return (
+    <svg
+      className="app__brand-mark"
+      viewBox="0 0 512 512"
+      width="34"
+      height="34"
+      aria-hidden="true"
+    >
+      <rect width="512" height="512" rx="112" fill="#14161C" />
+      <rect
+        x="8"
+        y="8"
+        width="496"
+        height="496"
+        rx="104"
+        fill="none"
+        stroke="#2A2E38"
+        strokeWidth="16"
+      />
+      <g
+        fill="none"
+        strokeWidth="40"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M196 150 L112 256 L196 362" stroke="#4FD1E8" />
+        <path d="M316 150 L400 256 L316 362" stroke="#4FD1E8" />
+        <path d="M292 132 L220 380" stroke="#C4A2FF" />
+      </g>
+    </svg>
+  );
+}
+
 function SectionFallback() {
   return (
     <div className="section-fallback" role="status" aria-live="polite">
@@ -156,8 +191,11 @@ export default function App() {
             aria-label="Aller à l'accueil"
             onClick={() => go("home")}
           >
-            <span className="app__brand-name">Holberton</span>
-            <span className="app__brand-sub">spé Full Stack</span>
+            <BrandMark />
+            <span className="app__brand-text">
+              <span className="app__brand-name">Holberton</span>
+              <span className="app__brand-sub">spé Full Stack</span>
+            </span>
           </button>
           <button
             type="button"
