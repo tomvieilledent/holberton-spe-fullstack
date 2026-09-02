@@ -76,7 +76,7 @@ export default function Home() {
     <div>
       <div style={BLEED}>
         <H2 accent={REACT_ACCENT} rule={false}>
-          Holberton — spécialisation Full Stack
+          Holberton — Spécialisation Full Stack
         </H2>
       </div>
 
