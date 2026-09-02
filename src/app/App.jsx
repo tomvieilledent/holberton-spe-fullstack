@@ -174,7 +174,7 @@ export default function App() {
         >
           <Menu size={22} aria-hidden="true" />
         </button>
-        <span className="app__brand-mobile">Holberton · spécialisation Full Stack</span>
+        <span className="app__brand-mobile">Holberton · Full Stack</span>
       </header>
 
       <div
@@ -194,7 +194,7 @@ export default function App() {
             <BrandMark />
             <span className="app__brand-text">
               <span className="app__brand-name">Holberton</span>
-              <span className="app__brand-sub">spécialisation Full Stack</span>
+              <span className="app__brand-sub">Full Stack</span>
             </span>
           </button>
           <button
