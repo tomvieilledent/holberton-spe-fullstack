@@ -83,9 +83,10 @@ npm run dev        # http://localhost:3000
 | `test` | `npm run test` | Tests en mode watch |
 | `test:run` | `npm run test:run` | Tests une fois (utilisé en CI) |
 | `test:coverage` | `npm run test:coverage` | Tests + rapport de couverture |
+| `spec:lint` | `npm run spec:lint` | Lint du contrat `docs/openapi.yaml` (Spectral) |
 | `build` | `npm run build` | Build de production dans `dist/` |
 | `preview` | `npm run preview` | Sert le build en local |
-| `ci` | `npm run ci` | `lint` + `test:run` + `build` |
+| `ci` | `npm run ci` | `lint` + `spec:lint` + `test:run` + `build` |
 
 ## Docker
 

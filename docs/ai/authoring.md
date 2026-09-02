@@ -33,7 +33,7 @@ N'importe lequel de ces formats :
    - au moins un exemple concret (`Code`) et, si pertinent, un diagramme Mermaid ;
    - 2 à 4 `SourceLink` vers des sources primaires ;
    - le placement dans `NAV` (ordre = ordre du cours).
-4. **Contrôle** — `npm run ci` (lint + tests + build) doit passer ; la section
+4. **Contrôle** — `npm run ci` (lint + spec:lint + tests + build) doit passer ; la section
    doit se rendre sans erreur (couvert par `src/app/App.test.jsx`).
 5. **Traçabilité** — la PR liste les sources utilisées et ce qui a été **ajouté
    par l'IA** vs **fourni**.

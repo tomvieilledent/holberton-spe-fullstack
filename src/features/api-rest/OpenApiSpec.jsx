@@ -201,9 +201,34 @@ components:
         </li>
       </Ul>
 
+      <H3>Linter le contrat avec Spectral</H3>
+      <P>
+        <strong>Spectral</strong> (Stoplight) analyse le contrat contre un jeu
+        de règles et échoue si une règle de sévérité <InlineCode>error</InlineCode>{" "}
+        est violée : c'est un <strong>test</strong> à part entière, exécuté en
+        CI au même titre que les tests unitaires. Le ruleset vit dans{" "}
+        <InlineCode>.spectral.yaml</InlineCode> à la racine et étend les règles
+        OpenAPI officielles.
+      </P>
+      <Code>{`# .spectral.yaml
+extends: ["spectral:oas"]
+rules:
+  info-contact: off
+  operation-operationId: error
+  operation-description: error
+  operation-tags: error
+  operation-success-response: error`}</Code>
+      <P>
+        Ce dépôt câble Spectral dans le script <InlineCode>ci</InlineCode> de{" "}
+        <InlineCode>package.json</InlineCode> et dans le workflow GitHub Actions :
+      </P>
+      <Code>{`# package.json
+"spec:lint": "spectral lint docs/openapi.yaml",
+"ci": "npm run lint && npm run spec:lint && npm run test:run && npm run build"`}</Code>
+
       <H3>Dans une CI</H3>
-      <Code>{`# lint du contrat
-npx @redocly/cli lint openapi.yaml
+      <Code>{`# lint du contrat (échoue la CI sur erreur)
+npx spectral lint docs/openapi.yaml
 
 # la spec ne doit pas diverger du code (test de contrat)
 npx portman --cliOptionsFile portman.json
@@ -232,6 +257,10 @@ npx @redocly/cli build-docs openapi.yaml -o dist/api.html`}</Code>
       {" · "}
       <SourceLink href="https://redocly.com/docs/cli/">
         redocly.com — Redocly CLI (lint &amp; docs)
+      </SourceLink>
+      {" · "}
+      <SourceLink href="https://docs.stoplight.io/docs/spectral/">
+        docs.stoplight.io — Spectral (lint de contrats)
       </SourceLink>
     </div>
   );

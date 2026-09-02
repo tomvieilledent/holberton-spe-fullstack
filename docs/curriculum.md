@@ -12,7 +12,7 @@ Une ligne par semaine. Chaque semaine ajoute des sections au site
 > **Critères d'acceptation**
 > - la section apparaît dans la navigation, à la bonne place (ordre du cours) ;
 > - elle suit la trame Problème → Solution → exemples → ressources ;
-> - `npm run ci` passe (lint + tests + build) ;
+> - `npm run ci` passe (lint + spec:lint + tests + build) ;
 > - `docs/` est à jour si la semaine introduit un modèle de données / d'échange.
 
 ## Semaines
