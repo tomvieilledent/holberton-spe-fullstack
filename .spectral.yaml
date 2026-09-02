@@ -1,0 +1,14 @@
+# Règles de lint du contrat d'API (docs/openapi.yaml).
+# Étend le jeu de règles OpenAPI officiel de Spectral.
+extends: ["spectral:oas"]
+
+rules:
+  # Le contrat du site est court et pédagogique : on tolère l'absence de
+  # certaines métadonnées de contact.
+  info-contact: off
+
+  # Bonnes pratiques imposées comme erreurs :
+  operation-operationId: error
+  operation-description: error
+  operation-tags: error
+  operation-success-response: error

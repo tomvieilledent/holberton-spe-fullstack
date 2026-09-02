@@ -9,11 +9,19 @@ info:
 servers:
   - url: https://www.vlldnt.fr/api/v1
 
+tags:
+  - name: weeks
+    description: Semaines du cursus
+  - name: sections
+    description: Sections de cours
+
 paths:
   /weeks:
     get:
       summary: Liste les semaines de cours
+      description: Renvoie toutes les semaines du cursus, triées par numéro croissant.
       operationId: listWeeks
+      tags: [weeks]
       responses:
         "200":
           description: Collection de semaines
@@ -27,7 +35,9 @@ paths:
   /sections:
     get:
       summary: Liste les sections
+      description: Renvoie les sections, éventuellement filtrées par semaine.
       operationId: listSections
+      tags: [sections]
       parameters:
         - name: week
           in: query
@@ -50,7 +60,9 @@ paths:
   /sections/{sectionId}:
     get:
       summary: Détail d'une section
+      description: Renvoie une section identifiée par son sectionId.
       operationId: getSection
+      tags: [sections]
       parameters:
         - name: sectionId
           in: path
