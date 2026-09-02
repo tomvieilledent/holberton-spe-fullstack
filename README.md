@@ -14,6 +14,12 @@ l'urbanisation du SI.
 > 🔗 **Site en ligne :** <https://vlldnt.fr> — VPS OVH + nginx, déploiement
 > automatique à chaque `push` sur `main`.
 
+La **page d'accueil** du site explique cette démarche : un catalogue de toutes
+les notions vues depuis le début de l'année, complété à chaque nouvelle notion,
+et construit en appliquant (ou en s'en approchant) les règles décrites dans la
+documentation du dépôt. Aucun secret n'y figure : la clé SSH et l'hôte du VPS
+vivent uniquement dans les *GitHub Actions secrets*.
+
 ## Ce dépôt est lui-même l'exercice
 
 Le contenu du site enseigne des notions ; le dépôt les **applique**. La règle du
@@ -46,6 +52,8 @@ maximum de concepts du cursus.
 | BDD, Gherkin, Scenario Outline | `features/navigation.feature` |
 | Aligner les modèles, cohérence entre modèles | `docs/architecture.md` (dictionnaire de données) |
 | Documentation as Code, SSOT, ADR | `docs/` versionné avec le code |
+| SEO / robots / plan de site / `llms.txt` | `public/robots.txt`, `public/sitemap.xml`, `public/llms.txt`, `index.html` (canonical + Open Graph) |
+| En-têtes de sécurité HTTP (CSP, HSTS, COOP, anti-clickjacking) | `deploy/nginx/vlldnt-security-headers.conf`, `deploy/nginx/vlldnt.fr.conf` |
 
 ## Stack
 

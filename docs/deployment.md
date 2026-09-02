@@ -12,14 +12,14 @@ push main ─► GitHub Actions ─► npm ci + npm run build ─► rsync dist/
 
 | Point | Constat |
 | --- | --- |
-| IPv4 / IPv6 | `137.74.175.164` / `2001:41d0:305:2100::1:5750` |
+| IPv4 / IPv6 | `<IPv4 du VPS>` / `<IPv6 du VPS>` (voir la zone DNS OVH / `dig +short vlldnt.fr`) |
 | OS | **Ubuntu** (OpenSSH 10.2p1 → Ubuntu 25.x) |
 | SSH | port **22**, joignable |
 | nginx | **déjà installé** (`nginx/1.28.3 (Ubuntu)`), sert `:80` et `:443` |
 | TLS | un certificat valide pour `vlldnt.fr` est **déjà en place** ; HTTP→HTTPS déjà actif |
 | Site actuel | une app **« Avyro — Training & Room »** (React/Vite) est servie sur `https://vlldnt.fr` |
 | Firewall OVH (edge) | 22 / 80 / 443 joignables → rien à ouvrir |
-| DNS | `A vlldnt.fr` et `A www.vlldnt.fr` → `137.74.175.164` **déjà OK** ; pas de `AAAA` |
+| DNS | `A vlldnt.fr` et `A www.vlldnt.fr` → IPv4 du VPS **déjà OK** ; pas de `AAAA` |
 
 > ⚠️ **Le site « Avyro » sera remplacé.** `vps-setup.sh` sauvegarde
 > `/etc/nginx` (`/etc/nginx.bak.<date>`), désactive tout vhost qui déclare
@@ -34,18 +34,21 @@ push main ─► GitHub Actions ─► npm ci + npm run build ─► rsync dist/
 | Exécution de `scripts/vps-setup.sh` | en root sur le VPS (ou me donner un accès SSH) |
 | Clé de déploiement | générée ci-dessous, ajoutée en secret GitHub |
 | Email Let's Encrypt | `tomvieilledent@gmail.com` (modifiable) |
-| `AAAA` (optionnel) | `AAAA vlldnt.fr` et `AAAA www.vlldnt.fr` → `2001:41d0:305:2100::1:5750` |
+| `AAAA` (optionnel) | `AAAA vlldnt.fr` et `AAAA www.vlldnt.fr` → IPv6 du VPS |
 
 ## 3. DNS
 
 Zone gérée chez **OVH**. État actuel + ajout optionnel :
 
 ```
-A     vlldnt.fr        137.74.175.164                    # déjà présent
-A     www.vlldnt.fr    137.74.175.164                    # déjà présent
-AAAA  vlldnt.fr        2001:41d0:305:2100::1:5750         # à ajouter (optionnel)
-AAAA  www.vlldnt.fr    2001:41d0:305:2100::1:5750         # à ajouter (optionnel)
+A     vlldnt.fr        <IPv4 du VPS>     # déjà présent
+A     www.vlldnt.fr    <IPv4 du VPS>     # déjà présent
+AAAA  vlldnt.fr        <IPv6 du VPS>     # à ajouter (optionnel)
+AAAA  www.vlldnt.fr    <IPv6 du VPS>     # à ajouter (optionnel)
 ```
+
+> Les adresses réelles sont dans la zone DNS OVH (et publiques via `dig`) ;
+> elles ne sont pas recopiées dans le dépôt.
 
 Les enregistrements `MX` / `SPF` / `TXT` de la messagerie OVH ne sont **pas**
 touchés. `dig +short vlldnt.fr` pour vérifier.
@@ -70,8 +73,16 @@ bash vps-setup.sh
 ```
 
 Le script : installe nginx + certbot, crée l'utilisateur `deploy`, la racine
-`/var/www/vlldnt.fr`, le pare-feu UFW, obtient le certificat, pose le vhost
-final (`deploy/nginx/vlldnt.fr.conf`) et le hook de reload post-renouvellement.
+`/var/www/vlldnt.fr`, le pare-feu UFW, obtient le certificat, écrit le snippet
+`/etc/nginx/snippets/vlldnt-security-headers.conf`
+(`deploy/nginx/vlldnt-security-headers.conf`), pose le vhost final
+(`deploy/nginx/vlldnt.fr.conf`) et le hook de reload post-renouvellement.
+
+> **Mise à jour des en-têtes seuls** (CSP, COOP, HSTS…) sans reprovisionner :
+> recopier `deploy/nginx/vlldnt-security-headers.conf` dans
+> `/etc/nginx/snippets/` puis `sudo nginx -t && sudo systemctl reload nginx`.
+> Les `add_header` sont répétés dans chaque `location` via `include` : nginx
+> cesse d'hériter des en-têtes parents dès qu'un `location` en déclare un.
 
 ## 6. Secrets & variables GitHub
 
@@ -105,9 +116,11 @@ Le workflow *Deploy to VPS (vlldnt.fr)* build et `rsync` le `dist/`.
 ## 8. Vérifier
 
 ```bash
-curl -I https://vlldnt.fr            # 200, HSTS présent
+curl -I https://vlldnt.fr            # 200 ; HSTS + CSP + COOP + X-Frame-Options: DENY
 curl -I http://vlldnt.fr             # 301 -> https
 curl -I https://www.vlldnt.fr        # 301 -> https://vlldnt.fr
+curl -sI https://vlldnt.fr/robots.txt | head -1   # 200 (text/plain, pas de HTML)
+curl -sI https://vlldnt.fr/llms.txt  | head -1    # 200
 ```
 
 ## Renouvellement TLS

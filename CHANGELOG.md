@@ -7,6 +7,17 @@ versionnage sémantique + Conventional Commits.
 ## [Unreleased]
 
 ### Added
+- **Page d'accueil** (`src/features/home/Home.jsx`) : but du site (catalogue des
+  notions vues depuis le début de l'année, mis à jour à chaque notion), lien du
+  dépôt GitHub, explication du « fait selon les règles de la doc ». Devient la
+  section par défaut ; accessible via le bouton *Accueil* et le logo.
+- `public/robots.txt` + `public/sitemap.xml` (corrige l'audit SEO Lighthouse
+  `robots-txt`) et `public/llms.txt` (audit *agentic browsing* `llms-txt`).
+- En-têtes de sécurité nginx renforcés : `Content-Security-Policy`,
+  `Cross-Origin-Opener-Policy`, `X-Frame-Options: DENY`. Centralisés dans
+  `deploy/nginx/vlldnt-security-headers.conf`, `include` dans chaque `location`
+  (nginx n'hérite plus des `add_header` parents dès qu'un `location` en ajoute).
+- `index.html` : `<link rel="canonical">` + balises Open Graph / Twitter.
 - Portage du site sur une structure Vite + React (rebuild statique).
 - Architecture **feature-sliced** : `src/features/<feature>/`, `src/shared/ui/`,
   `src/app/` ; chaque section est un chunk chargé via `React.lazy` / `Suspense`.
