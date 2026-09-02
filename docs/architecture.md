@@ -11,7 +11,7 @@ flowchart LR
     GH -->|Actions: lint + tests + build| CI{CI verte ?}
     CI -->|oui, sur main| Deploy[Build de production]
     Deploy --> Pages[GitHub Pages]
-    Deploy -. cible en préparation .-> VPS[VPS - nginx - www.vlldnt.com]
+    Deploy -. cible en préparation .-> VPS[VPS - nginx - www.vlldnt.fr]
     Pages --> User[Navigateur]
     VPS --> User
 ```

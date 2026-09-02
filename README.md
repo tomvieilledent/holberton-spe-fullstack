@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml)
 [![Deploy](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml)
-[![Pages](https://img.shields.io/badge/site-GitHub%20Pages-121013?logo=github)](https://tomvieilledent.github.io/holberton-fullstack/)
+[![Site](https://img.shields.io/badge/site-www.vlldnt.fr-2ea44f)](https://www.vlldnt.fr)
 
 Site **statique** de révision de la spécialisation Holberton Full Stack : une
 seule application React (Vite) qui présente, semaine après semaine, les notions
@@ -11,7 +11,8 @@ DevOps & Git, GitHub Actions, l'analyse et la conception (Merise, UML), les API
 REST / OpenAPI / JSON Schema, les spécifications (PRD, INVEST, BDD/Gherkin) et
 l'urbanisation du SI.
 
-> 🔗 **Site en ligne :** <https://tomvieilledent.github.io/holberton-fullstack/>
+> 🔗 **Site en ligne :** <https://www.vlldnt.fr> (VPS + nginx)
+> Miroir : <https://tomvieilledent.github.io/holberton-fullstack/> (GitHub Pages)
 
 ## Ce dépôt est lui-même l'exercice
 

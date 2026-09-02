@@ -7,7 +7,7 @@
 
 Le site doit se mettre à jour tout seul à chaque merge sur `main`, sans étape
 manuelle. Deux cibles possibles : GitHub Pages ou le VPS de l'auteur
-(`www.vlldnt.com`).
+(`www.vlldnt.fr`).
 
 ## Décision
 
@@ -17,7 +17,7 @@ manuelle. Deux cibles possibles : GitHub Pages ou le VPS de l'auteur
   `main`, après build.
 - Cible initiale : **GitHub Pages** (source : GitHub Actions, sans branche
   `gh-pages`).
-- Cible retenue à terme : **VPS + nginx** derrière `www.vlldnt.com`
+- Cible retenue à terme : **VPS + nginx** derrière `www.vlldnt.fr`
   (déclenché depuis Actions via SSH/rsync ou image Docker). Voir ADR 0004
   quand les accès seront disponibles.
 
