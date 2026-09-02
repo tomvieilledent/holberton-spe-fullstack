@@ -92,6 +92,17 @@ certbot certonly --webroot -w "${ACMEROOT}" \
   --cert-name "${DOMAIN}" -d "${DOMAIN}" -d "www.${DOMAIN}" \
   --non-interactive --agree-tos -m "${EMAIL}" --keep-until-expiring --expand
 
+echo ">> Snippet en-têtes de sécurité"
+install -d /etc/nginx/snippets
+cat > "/etc/nginx/snippets/vlldnt-security-headers.conf" <<'EOF'
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header Cross-Origin-Opener-Policy "same-origin" always;
+add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'" always;
+EOF
+
 echo ">> Vhost final (HTTPS)"
 cat > "/etc/nginx/sites-available/${DOMAIN}.conf" <<'EOF'
 server {
@@ -123,26 +134,22 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers off;
 
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-
     gzip on;
     gzip_vary on;
     gzip_min_length 512;
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
 
+    include snippets/vlldnt-security-headers.conf;
+
     location /assets/ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
+        include snippets/vlldnt-security-headers.conf;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
         try_files $uri =404;
     }
     location / {
+        include snippets/vlldnt-security-headers.conf;
+        add_header Cache-Control "no-cache" always;
         try_files $uri $uri/ /index.html;
-    }
-    location = /index.html {
-        add_header Cache-Control "no-cache";
     }
 }
 EOF
