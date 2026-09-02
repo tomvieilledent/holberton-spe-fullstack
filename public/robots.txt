@@ -1,0 +1,5 @@
+# https://vlldnt.fr — site statique de révision, tout est public.
+User-agent: *
+Allow: /
+
+Sitemap: https://vlldnt.fr/sitemap.xml
