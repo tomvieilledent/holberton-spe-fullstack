@@ -49,7 +49,7 @@ function Hero() {
         style={{
           position: "relative",
           padding: "clamp(16px, 4vw, 30px)",
-          maxWidth: 640,
+          maxWidth: 880,
         }}
       >
         <p
