@@ -383,6 +383,7 @@ a:hover {
   .app {
     display: grid;
     grid-template-columns: var(--sidebar-w) 1fr;
+    align-items: start;
   }
 
   .app__topbar,
@@ -391,13 +392,15 @@ a:hover {
     display: none;
   }
 
+  /* Panneau latéral : collé en haut, toute la hauteur visible, scroll propre. */
   .app__sidebar {
     position: sticky;
-    top: 0;
-    inset: auto;
+    inset: 0 auto auto auto; /* top: 0 ; le reste auto */
+    align-self: start;
     width: auto;
     height: 100vh;
-    height: 100svh;
+    height: 100dvh;
+    overflow-y: auto;
     transform: none;
     transition: none;
     box-shadow: none;
