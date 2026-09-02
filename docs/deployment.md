@@ -88,9 +88,9 @@ Repo → *Settings → Secrets and variables → Actions* :
 En CLI :
 
 ```bash
-gh secret set SSH_HOST  --repo tomvieilledent/holberton-fullstack --body "<IP>"
-gh secret set SSH_USER  --repo tomvieilledent/holberton-fullstack --body "deploy"
-gh secret set SSH_KEY   --repo tomvieilledent/holberton-fullstack < ~/.ssh/vlldnt_deploy
+gh secret set SSH_HOST  --repo tomvieilledent/holberton-spe-fullstack --body "<IP>"
+gh secret set SSH_USER  --repo tomvieilledent/holberton-spe-fullstack --body "deploy"
+gh secret set SSH_KEY   --repo tomvieilledent/holberton-spe-fullstack < ~/.ssh/vlldnt_deploy
 ```
 
 ## 7. Déployer

@@ -1,7 +1,7 @@
 # Holberton — spé Full Stack
 
-[![CI](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/ci.yml)
-[![Deploy](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml/badge.svg)](https://github.com/tomvieilledent/holberton-fullstack/actions/workflows/deploy.yml)
+[![CI](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/ci.yml)
+[![Deploy](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/deploy.yml/badge.svg)](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/deploy.yml)
 [![Site](https://img.shields.io/badge/site-vlldnt.fr-2ea44f)](https://vlldnt.fr)
 
 Site **statique** de révision de la spécialisation Holberton Full Stack : une
