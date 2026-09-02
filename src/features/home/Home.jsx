@@ -82,7 +82,7 @@ export default function Home() {
 
       <Hero />
 
-      <p style={{ margin: "10px 0" }}>
+      <p style={{ ...BLEED, margin: "10px 0" }}>
         <SourceLink href="https://github.com/tomvieilledent/holberton-spe-fullstack">
           github.com/tomvieilledent/holberton-spe-fullstack
         </SourceLink>
