@@ -2,6 +2,14 @@
 import { H2, SourceLink } from "../../shared/ui/primitives.jsx";
 import { REACT_ACCENT, LINE } from "../../shared/ui/tokens.js";
 
+/* Débord symétrique : +1/3 de largeur par rapport à la colonne de texte,
+   borné à la fenêtre pour éviter un scroll horizontal sur mobile.
+   Partagé par le titre et le bandeau pour qu'ils s'alignent à gauche. */
+const BLEED = {
+  width: "min(133.333%, calc(100vw - 24px))",
+  marginLeft: "calc((100% - min(133.333%, calc(100vw - 24px))) / 2)",
+};
+
 /* Bandeau de garde : photo large, texte posé par-dessus.
    Image servie en local (public/) — respecte la CSP `img-src 'self'`.
    Un dégradé sombre garantit le contraste du texte (WCAG AA). */
@@ -11,14 +19,11 @@ function Hero() {
       role="img"
       aria-label="Poste de travail : un ordinateur portable affichant du code"
       style={{
+        ...BLEED,
         position: "relative",
         overflow: "hidden",
         border: `1px solid ${LINE}`,
         borderRadius: 12,
-        /* débord symétrique : +1/3 de largeur par rapport à la colonne de texte,
-           borné à la fenêtre pour éviter un scroll horizontal sur mobile */
-        width: "min(133.333%, calc(100vw - 24px))",
-        marginLeft: "calc((100% - min(133.333%, calc(100vw - 24px))) / 2)",
         marginTop: 6,
         marginBottom: 22,
         aspectRatio: "1600 / 600",
@@ -69,7 +74,9 @@ function Hero() {
 export default function Home() {
   return (
     <div>
-      <H2 accent={REACT_ACCENT}>Holberton — spécialisation Full Stack</H2>
+      <div style={BLEED}>
+        <H2 accent={REACT_ACCENT}>Holberton — spécialisation Full Stack</H2>
+      </div>
 
       <Hero />
 
