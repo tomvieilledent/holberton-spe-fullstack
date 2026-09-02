@@ -34,7 +34,9 @@ chown "${DEPLOY_USER}:${DEPLOY_USER}" "/home/${DEPLOY_USER}/.ssh/authorized_keys
 chmod 600 "/home/${DEPLOY_USER}/.ssh/authorized_keys"
 
 echo ">> Racine web : ${WEBROOT}"
-install -d -o "${DEPLOY_USER}" -g "${DEPLOY_USER}" "${WEBROOT}"
+install -d "${WEBROOT}"
+# chown récursif : le dossier peut préexister avec les fichiers d'un ancien site.
+chown -R "${DEPLOY_USER}:${DEPLOY_USER}" "${WEBROOT}"
 install -d "${ACMEROOT}"
 if [ ! -f "${WEBROOT}/index.html" ]; then
   printf '<!doctype html><meta charset="utf-8"><title>%s</title><h1>%s — déploiement en cours</h1>\n' \
@@ -53,13 +55,17 @@ cp -a /etc/nginx "${BACKUP}"
 echo "   -> ${BACKUP}"
 
 echo ">> Désactivation des vhosts qui revendiquent ${DOMAIN} (hors le nôtre)"
+# nginx (Ubuntu) inclut « sites-enabled/* » SANS filtre d'extension : renommer
+# en .disabled ne suffit pas, il faut sortir le fichier du dossier.
+DISABLED_DIR="/etc/nginx/_disabled"
+install -d "${DISABLED_DIR}"
 rm -f /etc/nginx/sites-enabled/default
 for f in /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*.conf; do
   [ -e "$f" ] || continue
   case "$f" in */"${DOMAIN}.conf") continue ;; esac
-  if grep -Eq "server_name[^;]*\b${DOMAIN//./\\.}\b" "$f" 2>/dev/null; then
-    echo "   - $f  (contient ${DOMAIN}, désactivé -> $f.disabled)"
-    mv "$f" "$f.disabled"
+  if grep -Eq "server_name[^;]*(^|[[:space:]])${DOMAIN//./\\.}([[:space:]]|;)" "$f" 2>/dev/null; then
+    echo "   - $f  (déclare ${DOMAIN}) -> ${DISABLED_DIR}/"
+    mv "$f" "${DISABLED_DIR}/"
   fi
 done
 
