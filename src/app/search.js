@@ -1,6 +1,6 @@
 /* Index de recherche plein texte, construit à partir du source des sections.
    Chargé à la demande (import dynamique) pour ne pas alourdir le bundle initial. */
-import { NAV, HOME } from "./nav.js";
+import { NAV } from "./nav.js";
 
 const sources = import.meta.glob("../features/**/*.jsx", {
   query: "?raw",
@@ -20,21 +20,6 @@ function toText(src) {
 
 export function buildIndex() {
   const entries = [];
-
-  {
-    const text = toText(sources[`../features/${HOME.file}`] || "");
-    entries.push({
-      id: HOME.id,
-      label: HOME.label,
-      group: "Présentation",
-      category: "Accueil",
-      accent: "var(--muted)",
-      meta: `${HOME.label} accueil présentation but du site`.toLowerCase(),
-      text,
-      lower: text.toLowerCase(),
-    });
-  }
-
   for (const cat of NAV) {
     for (const group of cat.groups) {
       for (const item of group.items) {

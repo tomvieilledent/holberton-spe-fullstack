@@ -14,11 +14,11 @@ l'urbanisation du SI.
 > 🔗 **Site en ligne :** <https://vlldnt.fr> — VPS OVH + nginx, déploiement
 > automatique à chaque `push` sur `main`.
 
-La **page d'accueil** du site explique cette démarche : un catalogue de toutes
-les notions vues depuis le début de l'année, complété à chaque nouvelle notion,
-et construit en appliquant (ou en s'en approchant) les règles décrites dans la
-documentation du dépôt. Aucun secret n'y figure : la clé SSH et l'hôte du VPS
-vivent uniquement dans les *GitHub Actions secrets*.
+Le site est un catalogue de toutes les notions vues depuis le début de l'année,
+complété à chaque nouvelle notion, construit en appliquant (ou en s'en
+approchant) les règles décrites dans la documentation du dépôt. Aucun secret
+n'y figure : la clé SSH et l'hôte du VPS vivent uniquement dans les
+*GitHub Actions secrets*.
 
 ## Ce dépôt est lui-même l'exercice
 

@@ -28,25 +28,11 @@ describe("App — structure", () => {
     expect(screen.queryByText("Récap de la semaine")).not.toBeInTheDocument();
   });
 
-  it("ouvre la page d'accueil par défaut", async () => {
+  it("ouvre « React — les bases » par défaut", async () => {
     render(<App />);
     expect(
-      await screen.findByRole("heading", { name: /À propos de ce site/ })
+      await screen.findByRole("heading", { name: /React — les bases/ })
     ).toBeInTheDocument();
-    const home = screen.getByRole("button", { name: /^Accueil/ });
-    expect(home).toHaveAttribute("aria-current", "page");
-  });
-
-  it("le lien du dépôt GitHub est présent sur l'accueil", async () => {
-    render(<App />);
-    const main = document.querySelector("main");
-    const link = await within(main).findByRole("link", {
-      name: /tomvieilledent\/holberton-spe-fullstack/,
-    });
-    expect(link).toHaveAttribute(
-      "href",
-      "https://github.com/tomvieilledent/holberton-spe-fullstack"
-    );
   });
 
   it("liste les 4 catégories", () => {
