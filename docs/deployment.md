@@ -8,35 +8,49 @@ Chaque `push` sur `main` reconstruit et publie automatiquement via
 push main ─► GitHub Actions ─► npm ci + npm run build ─► rsync dist/ ─► /var/www/vlldnt.fr ─► nginx ─► https://vlldnt.fr
 ```
 
-## 1. Prérequis à me fournir / à préparer
+## 1. État constaté du VPS (2026-09-02)
+
+| Point | Constat |
+| --- | --- |
+| IPv4 / IPv6 | `137.74.175.164` / `2001:41d0:305:2100::1:5750` |
+| OS | **Ubuntu** (OpenSSH 10.2p1 → Ubuntu 25.x) |
+| SSH | port **22**, joignable |
+| nginx | **déjà installé** (`nginx/1.28.3 (Ubuntu)`), sert `:80` et `:443` |
+| TLS | un certificat valide pour `vlldnt.fr` est **déjà en place** ; HTTP→HTTPS déjà actif |
+| Site actuel | une app **« Avyro — Training & Room »** (React/Vite) est servie sur `https://vlldnt.fr` |
+| Firewall OVH (edge) | 22 / 80 / 443 joignables → rien à ouvrir |
+| DNS | `A vlldnt.fr` et `A www.vlldnt.fr` → `137.74.175.164` **déjà OK** ; pas de `AAAA` |
+
+> ⚠️ **Le site « Avyro » sera remplacé.** `vps-setup.sh` sauvegarde
+> `/etc/nginx` (`/etc/nginx.bak.<date>`), désactive tout vhost qui déclare
+> `server_name vlldnt.fr` (renommé en `*.disabled`) puis installe le nôtre.
+> Les fichiers de l'ancien site restent sur le disque, simplement plus servis.
+
+## 2. Ce qu'il reste à faire / me fournir
 
 | Élément | Détail |
 | --- | --- |
-| IP publique du VPS | IPv4 (et IPv6 si tu veux un AAAA) |
-| OS installé | Debian 12 ou Ubuntu 22.04/24.04 |
-| Accès SSH actuel | root + clé (ou mot de passe), port SSH (OVH : 22 par défaut) |
-| Firewall OVH | dans le manager OVH : autoriser 22, 80, 443 (ou désactiver le "Network Firewall") |
-| DNS de `vlldnt.fr` | géré chez OVH ou ailleurs — enregistrements à créer ci-dessous |
-| Email | pour l'enregistrement Let's Encrypt |
+| Dépôt GitHub | `gh repo create` (bloqué de mon côté, à lancer par toi) |
+| Exécution de `scripts/vps-setup.sh` | en root sur le VPS (ou me donner un accès SSH) |
+| Clé de déploiement | générée ci-dessous, ajoutée en secret GitHub |
+| Email Let's Encrypt | `tomvieilledent@gmail.com` (modifiable) |
+| `AAAA` (optionnel) | `AAAA vlldnt.fr` et `AAAA www.vlldnt.fr` → `2001:41d0:305:2100::1:5750` |
 
-> Le contenu actuellement sur le VPS pour ce domaine sera **remplacé**
-> (`vps-setup.sh` supprime le vhost `default` de nginx).
+## 3. DNS
 
-## 2. DNS
-
-Chez le gestionnaire DNS de `vlldnt.fr` :
+Zone gérée chez **OVH**. État actuel + ajout optionnel :
 
 ```
-A     vlldnt.fr        <IPv4 du VPS>
-A     www.vlldnt.fr    <IPv4 du VPS>
-; optionnel
-AAAA  vlldnt.fr        <IPv6 du VPS>
-AAAA  www.vlldnt.fr    <IPv6 du VPS>
+A     vlldnt.fr        137.74.175.164                    # déjà présent
+A     www.vlldnt.fr    137.74.175.164                    # déjà présent
+AAAA  vlldnt.fr        2001:41d0:305:2100::1:5750         # à ajouter (optionnel)
+AAAA  www.vlldnt.fr    2001:41d0:305:2100::1:5750         # à ajouter (optionnel)
 ```
 
-Pas de proxy Cloudflare requis. Attendre la propagation (`dig +short vlldnt.fr`).
+Les enregistrements `MX` / `SPF` / `TXT` de la messagerie OVH ne sont **pas**
+touchés. `dig +short vlldnt.fr` pour vérifier.
 
-## 3. Générer la clé de déploiement (sur ta machine)
+## 4. Générer la clé de déploiement (sur ta machine)
 
 ```bash
 ssh-keygen -t ed25519 -f ~/.ssh/vlldnt_deploy -N "" -C "gha-deploy-vlldnt"
@@ -45,7 +59,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/vlldnt_deploy -N "" -C "gha-deploy-vlldnt"
 - `~/.ssh/vlldnt_deploy.pub` → passée au script du VPS (`CI_PUBKEY`)
 - `~/.ssh/vlldnt_deploy` (privée) → secret GitHub `SSH_KEY`
 
-## 4. Provisionner le VPS (une fois, en root)
+## 5. Provisionner le VPS (une fois, en root)
 
 Copier `scripts/vps-setup.sh` sur le VPS, puis :
 
@@ -59,7 +73,7 @@ Le script : installe nginx + certbot, crée l'utilisateur `deploy`, la racine
 `/var/www/vlldnt.fr`, le pare-feu UFW, obtient le certificat, pose le vhost
 final (`deploy/nginx/vlldnt.fr.conf`) et le hook de reload post-renouvellement.
 
-## 5. Secrets & variables GitHub
+## 6. Secrets & variables GitHub
 
 Repo → *Settings → Secrets and variables → Actions* :
 
@@ -79,7 +93,7 @@ gh secret set SSH_USER  --repo tomvieilledent/holberton-fullstack --body "deploy
 gh secret set SSH_KEY   --repo tomvieilledent/holberton-fullstack < ~/.ssh/vlldnt_deploy
 ```
 
-## 6. Déployer
+## 7. Déployer
 
 ```bash
 git push origin main
@@ -88,7 +102,7 @@ git push origin main
 Le workflow *Deploy to VPS (vlldnt.fr)* build et `rsync` le `dist/`.
 `workflow_dispatch` permet aussi un déclenchement manuel.
 
-## 7. Vérifier
+## 8. Vérifier
 
 ```bash
 curl -I https://vlldnt.fr            # 200, HSTS présent

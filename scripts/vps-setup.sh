@@ -47,8 +47,23 @@ ufw allow OpenSSH        >/dev/null
 ufw allow 'Nginx Full'   >/dev/null
 ufw --force enable       >/dev/null
 
-echo ">> Vhost bootstrap (HTTP)"
+echo ">> Sauvegarde de la config nginx existante"
+BACKUP="/etc/nginx.bak.$(date +%Y%m%d-%H%M%S)"
+cp -a /etc/nginx "${BACKUP}"
+echo "   -> ${BACKUP}"
+
+echo ">> Désactivation des vhosts qui revendiquent ${DOMAIN} (hors le nôtre)"
 rm -f /etc/nginx/sites-enabled/default
+for f in /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*.conf; do
+  [ -e "$f" ] || continue
+  case "$f" in */"${DOMAIN}.conf") continue ;; esac
+  if grep -Eq "server_name[^;]*\b${DOMAIN//./\\.}\b" "$f" 2>/dev/null; then
+    echo "   - $f  (contient ${DOMAIN}, désactivé -> $f.disabled)"
+    mv "$f" "$f.disabled"
+  fi
+done
+
+echo ">> Vhost bootstrap (HTTP)"
 cat > "/etc/nginx/sites-available/${DOMAIN}.conf" <<EOF
 server {
     listen 80;
@@ -65,9 +80,11 @@ nginx -t
 systemctl reload nginx
 
 echo ">> Certificat Let's Encrypt (webroot)"
+# --keep-until-expiring : ne réémet pas si un certificat valide existe déjà.
+# --cert-name : lignée déterministe, réutilise un éventuel certificat existant.
 certbot certonly --webroot -w "${ACMEROOT}" \
-  -d "${DOMAIN}" -d "www.${DOMAIN}" \
-  --non-interactive --agree-tos -m "${EMAIL}" --keep-until-expiring
+  --cert-name "${DOMAIN}" -d "${DOMAIN}" -d "www.${DOMAIN}" \
+  --non-interactive --agree-tos -m "${EMAIL}" --keep-until-expiring --expand
 
 echo ">> Vhost final (HTTPS)"
 cat > "/etc/nginx/sites-available/${DOMAIN}.conf" <<'EOF'
