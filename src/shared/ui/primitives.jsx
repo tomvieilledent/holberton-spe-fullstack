@@ -1,10 +1,14 @@
 /* Primitives de contenu partagées par toutes les sections. */
 import { ExternalLink } from "lucide-react";
 import { FONT_BODY, FONT_DISPLAY, FONT_MONO, LINE, MUTED, TEXT } from "./tokens.js";
+import { highlight } from "./highlight.js";
 
 export function Code({ children }) {
+  const { html, lang } = highlight(children);
   return (
     <pre
+      className="code-block"
+      data-lang={lang}
       style={{
         background: "#0E1015",
         border: `1px solid ${LINE}`,
@@ -18,7 +22,10 @@ export function Code({ children }) {
         margin: "14px 0",
       }}
     >
-      <code>{children}</code>
+      <code
+        className="hljs"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </pre>
   );
 }
