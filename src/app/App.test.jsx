@@ -32,7 +32,7 @@ describe("App — structure", () => {
     render(<App />);
     const main = document.querySelector("main");
     expect(
-      await within(main).findByRole("heading", { name: /Holberton — spé Full Stack/ })
+      await within(main).findByRole("heading", { name: /Holberton — spécialisation Full Stack/ })
     ).toBeInTheDocument();
     const link = within(main).getByRole("link", {
       name: /tomvieilledent\/holberton-spe-fullstack/,

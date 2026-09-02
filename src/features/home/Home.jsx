@@ -69,7 +69,7 @@ function Hero() {
 export default function Home() {
   return (
     <div>
-      <H2 accent={REACT_ACCENT}>Holberton — spé Full Stack</H2>
+      <H2 accent={REACT_ACCENT}>Holberton — spécialisation Full Stack</H2>
 
       <Hero />
 

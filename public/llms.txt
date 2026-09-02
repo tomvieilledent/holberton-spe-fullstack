@@ -1,4 +1,4 @@
-# Holberton — spé Full Stack
+# Holberton — spécialisation Full Stack
 
 > Site statique de révision qui répertorie, semaine après semaine, toutes les
 > notions vues durant l'année de spécialisation Holberton Full Stack. Le contenu

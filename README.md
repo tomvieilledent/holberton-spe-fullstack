@@ -1,4 +1,4 @@
-# Holberton — spé Full Stack
+# Holberton — spécialisation Full Stack
 
 [![CI](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/ci.yml)
 [![Deploy](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/deploy.yml/badge.svg)](https://github.com/tomvieilledent/holberton-spe-fullstack/actions/workflows/deploy.yml)
