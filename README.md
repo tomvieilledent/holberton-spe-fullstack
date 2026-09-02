@@ -22,10 +22,13 @@ maximum de concepts du cursus.
 
 | Notion du cours | Où elle est appliquée dans le repo |
 | --- | --- |
-| Composants React, JSX, `useState`, lifting state up | `src/App.jsx` |
+| Composants React, JSX, `useState`, hooks, lifting state up | `src/app/App.jsx`, `src/features/**` |
+| Architecture SPA feature-sliced + `React.lazy` / `Suspense` (code-splitting par section) | `src/features/<feature>/`, `src/app/nav.js` |
+| Responsive **mobile-first**, routage par hash (deep links) | `src/index.css`, `src/app/App.jsx` |
 | Monter un projet avec Vite | `vite.config.js`, `index.html`, `src/main.jsx` |
 | ESLint (guillemets, points-virgules, variables inutilisées) | `eslint.config.js` |
-| Icônes Lucide | `src/App.jsx` (import `lucide-react`) |
+| Icônes Lucide | `src/shared/ui/`, `src/features/**` (import `lucide-react`) |
+| Rédaction de contenu assistée par IA, vérifiée et complétée | `docs/ai/authoring.md` |
 | Déploiement sur GitHub Pages | `.github/workflows/deploy.yml` + `base: "./"` |
 | Docker : empaqueter une application (build multi-stage) | `Dockerfile`, `nginx.conf`, `.dockerignore` |
 | Culture DevOps (CALMS), métriques DORA | `docs/adr/`, CI qui mesure lint + tests + build |
@@ -44,10 +47,12 @@ maximum de concepts du cursus.
 
 ## Stack
 
-- **React 18** + **Vite 5** (build statique, HMR)
+- **React 18** + **Vite** (build statique, HMR, code-splitting par section)
+- Architecture **feature-sliced** : `src/features/<feature>/` + `src/shared/ui/` + `src/app/`
+- SPA **mobile-first**, tiroir de navigation, deep links par `#hash`
 - **Vitest** + **Testing Library** (tests de comportement, environnement jsdom)
 - **ESLint 9** (flat config) + `eslint-plugin-react-hooks`
-- **GitHub Actions** : CI (lint / tests / build sur Node 20 & 22) + déploiement Pages
+- **GitHub Actions** : CI (lint / tests / build sur Node 20 & 22) + déploiement automatique
 - **Docker** (optionnel) : image nginx servant le build
 
 ## Démarrer
@@ -100,19 +105,31 @@ décrit dans [`CONTRIBUTING.md`](./CONTRIBUTING.md) et suivi dans
 ```
 holberton-fullstack/
 ├── src/
-│   ├── App.jsx            # le site (toutes les sections de cours)
-│   ├── App.test.jsx       # tests de navigation et de rendu
-│   ├── main.jsx           # point d'entrée React
-│   ├── index.css          # reset minimal
-│   └── test/setup.js      # setup Vitest / jest-dom
+│   ├── app/
+│   │   ├── App.jsx          # shell : layout mobile-first, tiroir, routage #hash, Suspense
+│   │   ├── App.test.jsx     # tests de navigation et de rendu
+│   │   └── nav.js           # NAV assemblé depuis les features (lazy imports)
+│   ├── features/            # une notion = un dossier = un chunk
+│   │   ├── react/           #   ReactBasics.jsx, ReactSetup.jsx, ReactDeploy.jsx
+│   │   ├── docker/  devops/  cicd/  merise/  vue/  svelte/
+│   │   ├── architecture/  data-modeling/  uml/
+│   │   ├── api-rest/  specs-bdd/  urbanization/
+│   │   └── overview/  tooling/
+│   ├── shared/ui/
+│   │   ├── primitives.jsx   # H2, H3, P, Ul, Code, InlineCode, Note, Table, SourceLink
+│   │   └── tokens.js        # couleurs, polices
+│   ├── main.jsx             # point d'entrée React
+│   ├── index.css            # design system mobile-first (variables CSS, media queries min-width)
+│   └── test/setup.js        # setup Vitest / jest-dom
 ├── docs/
-│   ├── architecture.md    # diagrammes UML (Mermaid), dictionnaire de données
-│   ├── curriculum.md      # journal semaine par semaine
-│   ├── data-model.sql     # MPD PostgreSQL du domaine "cursus"
-│   ├── openapi.yaml       # contrat d'API (hypothétique, read-only)
-│   └── adr/               # Architecture Decision Records
+│   ├── architecture.md      # diagrammes UML (Mermaid), dictionnaire de données
+│   ├── curriculum.md        # journal semaine par semaine
+│   ├── data-model.sql       # MPD PostgreSQL du domaine "cursus"
+│   ├── openapi.yaml         # contrat d'API (hypothétique, read-only)
+│   ├── ai/authoring.md      # pipeline de rédaction assistée par IA
+│   └── adr/                 # Architecture Decision Records
 ├── features/
-│   └── navigation.feature # spécification exécutable (Gherkin)
+│   └── navigation.feature   # spécification exécutable (Gherkin)
 ├── .github/
 │   ├── workflows/ci.yml
 │   ├── workflows/deploy.yml

@@ -121,9 +121,9 @@ stateDiagram-v2
 
 Un concept = un nom canonique = un type, dans **toutes** les couches.
 
-| Concept | Nom canonique | Type | SQL (`docs/data-model.sql`) | OpenAPI (`docs/openapi.yaml`) | UI (`src/App.jsx`) |
+| Concept | Nom canonique | Type | SQL (`docs/data-model.sql`) | OpenAPI (`docs/openapi.yaml`) | UI (`src/features/**`) |
 | --- | --- | --- | --- | --- | --- |
-| Identifiant de section | `section_id` | `slug` (`^[a-z0-9-]+$`) | `section.section_id` | `Section.sectionId` | `NAV[].items[].id` |
+| Identifiant de section | `section_id` | `slug` (`^[a-z0-9-]+$`) | `section.section_id` | `Section.sectionId` | `src/app/nav.js` |
 | Titre de section | `section_title` | `string` | `section.title` | `Section.title` | `H2` de la section |
 | Numéro de semaine | `week_number` | `integer >= 1` | `week.week_number` | `Week.number` | `docs/curriculum.md` |
 | URL de ressource | `resource_url` | `uri` | `resource.url` | `Resource.url` | `SourceLink href` |

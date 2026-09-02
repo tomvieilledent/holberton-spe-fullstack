@@ -11,10 +11,15 @@ Il évolue chaque semaine avec les notions vues en cours.
    ```bash
    git switch -c week-XX-sujet
    ```
-2. **Ajouter** les nouvelles sections dans `src/App.jsx`
-   - une fonction composant par section, réutilisant les blocs existants
-     (`H2`, `H3`, `P`, `Ul`, `Code`, `InlineCode`, `Note`, `Table`, `SourceLink`) ;
-   - référencer la section dans le tableau `NAV` (ordre = ordre du cours) ;
+2. **Ajouter** les nouvelles sections (architecture feature-sliced)
+   - un fichier par section : `src/features/<feature>/<NomSection>.jsx`,
+     `export default function`, réutilisant les primitives partagées
+     (`import { H2, H3, P, Ul, Code, InlineCode, Note, Table, SourceLink }
+     from "../../shared/ui/primitives.jsx"`) et les accents
+     (`import { X_ACCENT } from "../../shared/ui/tokens.js"`) ;
+   - déclarer la section dans `src/app/nav.js` via un `lazy(() => import(...))`
+     (ordre = ordre du cours) ;
+   - la rédaction suit `docs/ai/authoring.md` (assistée par IA, vérifiée) ;
    - **ne jamais modifier** une section existante sans raison explicite.
 3. **Documenter** en parallèle (Documentation as Code / SSOT) :
    - mettre à jour `docs/curriculum.md` (semaine, notions, liens) ;
@@ -61,7 +66,7 @@ ci: ajoute Node 22 à la matrice
 - **E**stimable — le périmètre tient en une PR.
 - **S**mall — une section = un concept.
 - **T**estable — elle apparaît dans `NAV` et se rend sans erreur
-  (couvert par `src/App.test.jsx`).
+  (couvert par `src/app/App.test.jsx`).
 
 ## Style de code
 
